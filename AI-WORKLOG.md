@@ -84,4 +84,12 @@ Notable AI-code decisions (the 2–3 examples required by the task) are marked w
 
 **⭐ Notable decision 6 — Found a real gap by questioning my own earlier work.** The user asked what actually differs between the admin product list and the public catalog beyond draft visibility. Answering that properly meant re-reading `product-repository.ts` from Phase 2, which revealed that `listPublished()` (used by the public catalog) selects `{ id, name, status }` — no `slug` — even though the public product page routes by slug (`/products/[slug]`), not `id`. The public catalog UI (not yet built) would have had no way to link to a product page at all. Flagged to the user rather than silently fixed, since it touches a public API contract; not yet fixed as of this entry — queued for when the public catalog page is implemented.
 
+### 2026-09-17 — Fix: fonts didn't match the Figma design
+
+- **Task:** The user tested the running app themselves (via a dev-server link) and reported the font didn't match the Figma mockups.
+- **AI contribution:** Claude Code traced it to `src/app/globals.css`: `--font-sans: var(--font-sans)` is a self-referential, always-undefined CSS variable (an artifact of running `create-next-app`, which wired up `--font-geist-sans`/`--font-geist-mono`, and then `shadcn init` overwriting `globals.css` with a template that expects the project to supply its own `--font-sans` — nobody ever connected the two). Because the variable never resolved, the browser fell back to its raw UA default font (a serif), not even Geist. Fixed by loading `Inter` (the font used throughout every Figma mockup) via `next/font/google` bound to `--font-sans` in `src/app/layout.tsx`, and removed the now-dangling `--font-mono: var(--font-geist-mono)` reference in `globals.css` since Geist was dropped entirely.
+- **My contribution:** Caught the visual mismatch by actually running the app instead of trusting the code; reported it as a font issue without diagnosing the root cause, which Claude Code then found and fixed.
+- **Verification:** `npx tsc --noEmit`/`npm run lint`/`npm run build` clean. Visually re-verified in a live `next dev` session — the login and product list pages now render in Inter, matching the Figma screenshots, instead of the browser's default serif.
+- **Reference:** [src/app/layout.tsx](src/app/layout.tsx), [src/app/globals.css](src/app/globals.css)
+
 <!-- Further entries appended below as implementation proceeds. -->
