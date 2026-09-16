@@ -124,4 +124,12 @@ Notable AI-code decisions (the 2–3 examples required by the task) are marked w
 - **Verification:** `npx tsc --noEmit`/`npm run lint`/`npm run build` clean (both routes correctly reported as dynamic `ƒ`, not prerendered). Manually verified in a live `next dev` session against the real seeded DB: catalog lists only the 2 published products (`wireless-mouse`, `usb-c-hub`), the draft `mechanical-keyboard` is absent from the list and 404s via the custom not-found page when visited directly by slug; product page renders characteristics/description correctly; confirmed via `document.querySelector('meta[name="description"]')` that the rendered meta description matches the product's `seoDescription`; checked both pages at mobile viewport width.
 - **Reference:** [src/app/page.tsx](src/app/page.tsx), [src/app/products/[slug]/page.tsx](src/app/products/[slug]/page.tsx), [src/components/public/site-header.tsx](src/components/public/site-header.tsx)
 
+### 2026-09-16 — Fix: `/admin/login` reachable while already authenticated
+
+- **Task:** The user found that visiting `/admin/login` with a valid session still showed the login form instead of redirecting to the product list.
+- **AI contribution:** The proxy's route matcher excluded `/admin/login` entirely (`/admin/((?!login).*)`), so it never ran the auth check for that route in either direction. Changed the matcher to cover `/admin/:path*` and added branching in `proxy()`: on `/admin/login`, an authenticated request is redirected to `/admin/products` and an unauthenticated one passes through; every other `/admin/*` route keeps the existing behavior (redirect to login when unauthenticated).
+- **My contribution:** Reported the bug found through manual use of the running app.
+- **Verification:** `npx tsc --noEmit`/`npm run lint`/`npm run build` clean. Verified live: with a valid session, navigating to `/admin/login` now redirects to `/admin/products`; after logging out, `/admin/login` renders normally.
+- **Reference:** [src/proxy.ts](src/proxy.ts)
+
 <!-- Further entries appended below as implementation proceeds. -->

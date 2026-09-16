@@ -148,4 +148,13 @@ Prompt No 36
 My bad: I forgot to highlight that I want to use Axios instead of native fetch for all requests from client-side. Record it into tech stack please. And refactor all API requests on client side to turn fetch into axios
 
 Prompt No 37
+Did we complete all required functionality for Admin side?
+
+Prompt No 38
+/compact
+
+Prompt No 39
 Lets continue Phase 4: we already implemented Admin side. Now we need to implement Public side pages
+
+Prompt No 40
+I found that login page is still available even when admin already authorized. It is not correct
