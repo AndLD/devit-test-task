@@ -1,0 +1,36 @@
+Prompt No 1
+Look, I am starting to do a test task for getting Fullstack position. See the task requirements in PROJECT-REQUIREMENTS.md file. Our goal is to do all the nested tasks (including the bonus ones).
+
+Now we just planning the flow and the order of implementation. No implementations yet. Lets just make a plan first.
+
+Regarding the optioned technologies mentioned in the project requirements file, I choose this: Next.js, Prisma, Zod, PostgreSQL, JWT, npm, shadcn/ui, Prettier+ESLint, Jest.
+If I forget to choose some technologies in this list, ask me about them. 
+
+Besides README.md and AI-WORKLOG.md, I think we need to introduce AGENTS.md file, which will include all the strategic decisions we make, to take this into account for AI agents as a part of harness. So the first one strategic decision is choosing specific technologies listed above (Next.js, Prisma etc.).
+
+Another strategic decision which I can highlight right now (so it also should be reflected on AGENTS.md the same as all future strategic decisions as well) is the future codebase must align to SOLID principles, have low coupling (prevent cyclic deps) and have high testability, so all core functionalities should be easily tested with unit/integration auto tests, and in-memory PostgreSQL instance should be used for the tests.
+Also AGENTS.md should include instruction on how to log to AI-WORKLOG.md.
+
+So, introduce initial versions of AGENTS.md file, AI-WORKLOG.md file and README.md file (initial version for README.md may include some placeholders so it should kind of skeleton of future production-ready README file according to the requirements). And provide a development plan here and wait for my approvement.
+
+QUESTIONS/ANSWERS for Prompt 2:
+Given the 6-8h core time budget plus 4 bonus tasks (LLM integration, Shopify import, Design Tools, Infrastructure), how should we prioritize? All are non-trivial additions.
+
+Bonus tasks are not included into the given time budget 6-8h, so 6-8 is for core, and bonus tasks takes its own bonus time (not defined by the interviewer, but lets consider it like 2-3h).
+
+1. If we talk on highlevel plan, I guess, we can start with some backend functionality and placeholder pages for all pages we need, and other things that do not rely on UI design including writing Docker Compose config to run PostgreSQL and Next there (during development we run Next without Docker, only DB in docker from start) and Prisma schemas / TS interfaces etc.
+2. Then before starting implementing UI (filling the placeholder pages), we need implement Design first (we need to draw design in Figma and then turn it into server/client components on Next using a tool (expecting to use Claude for this))
+3. Then we should implement UI pages and the rest of the core functionalities.
+4. Implement the rest of the bonus tasks (LLM integration and Shopify import).
+
+For automated tests against PostgreSQL, which approach for the 'in-memory' test DB?
+
+Dockerized ephemeral Postgres via testcontainers (Recommended)
+
+For the bonus LLM integration (SEO/description generation), which provider should the real (non-mocked) path use?
+
+OpenAI API
+
+For the 'Design Tools' bonus (full Figma/Stitch design transferred to code via AI), do you have an existing design ready?
+
+We will need to implement design (shadcn/ui based UI design) in Figma using Claude Design
