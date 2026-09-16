@@ -73,6 +73,15 @@ This repo follows a lightweight Git Flow. Any AI coding agent making commits mus
 - **Pull requests** — when a phase branch is complete (builds, lints, and its tests pass), open a PR into `develop`, not `main`. Merge `develop` into `main` only at a release milestone, via its own PR.
 - Keep phase branches scoped to their phase — don't bundle unrelated phases into one branch/PR, so review and AI-WORKLOG entries map cleanly to what shipped.
 
+## Logging to PROMPTS-HISTORY.txt
+
+[PROMPTS-HISTORY.txt](PROMPTS-HISTORY.txt) is a running record of the user's own instructions to the AI agent throughout this project — kept separate from AI-WORKLOG.md, which records what the AI/candidate *did*, not what was *asked*. Every AI coding agent working in this repo must:
+
+- Append each new message the user sends directly to the agent (chat instructions to Claude Code or any other AI tool used on this project), verbatim, as its own `Prompt No <n>` entry (incrementing from the last one in the file).
+- Only log the user's own words. Never log the agent's internal/system prompts, tool outputs, clarifying-question UI text, or its own responses.
+- When the agent asked clarifying questions and the user answered them (e.g. via a question/answer flow), append the question and the user's answer text under the same prompt entry (see the existing `Q/A for Prompt N` entries in the file for the format), since that answer is still the user's own input.
+- Append-only — never edit or renumber past entries.
+
 ## Logging to AI-WORKLOG.md
 
 AI-WORKLOG.md tracks AI tool usage and decisions across the project, as required by the task. Every AI coding agent working in this repo must:

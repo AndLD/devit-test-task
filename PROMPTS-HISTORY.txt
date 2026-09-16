@@ -52,3 +52,21 @@ Explain me why do we store refresh tokens to DB? Is it kind of sessions?
 
 Prompt No 7
 Please adjust the AGENTS.md or where it is more appropriate to do to make future committing changes align with Git Flow. Every development phase should be locked in separated branch. After it is completed, you make PR to main (or to "development" it would be better, lets keep main as for production, and make a diff branch for development)
+
+Prompt No 8
+I am facing this problem: "andrey@Andriis-Laptop devit-test-task % gh auth login
+zsh: command not found: gh"
+
+Prompt No 9
+can you install gh yourself
+
+Prompt No 10
+Did
+
+Prompt No 12
+Please take into account not to include phase number mentions in branch names. it looks not scalable. You can add a sentence on this as additional instruction near Git Flow instruction
+
+Prompt No 13
+Please look at PROMPTS-HISTORY.txt
+
+I want you to include as instruction at AGENTS.md: record all user prompts (not your loop engineering prompts, but only my own messages) to PROMPTS-HISTORY.txt
