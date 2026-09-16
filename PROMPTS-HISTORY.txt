@@ -73,3 +73,9 @@ I want you to include as instruction at AGENTS.md: record all user prompts (not 
 
 Prompt No 14
 Execute Phase 2
+
+Prompt No 15
+Merge the PR please
+
+Prompt No 16
+For future: do not delete feature branches. Add it as instruction to AGENTS.md

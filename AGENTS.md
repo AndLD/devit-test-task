@@ -72,6 +72,7 @@ This repo follows a lightweight Git Flow. Any AI coding agent making commits mus
   - Don't encode the [DEVELOPMENT-PLAN.md](DEVELOPMENT-PLAN.md) phase number in the branch name (no `phase-2-*`) — phase numbering is a planning artifact that can be reordered or split, while branch names should stay meaningful and scalable (e.g. surviving a rebase of the plan) on their own.
 - **Pull requests** — when a phase branch is complete (builds, lints, and its tests pass), open a PR into `develop`, not `main`. Merge `develop` into `main` only at a release milestone, via its own PR.
 - Keep phase branches scoped to their phase — don't bundle unrelated phases into one branch/PR, so review and AI-WORKLOG entries map cleanly to what shipped.
+- **Do not delete feature/phase branches after merging** (neither locally nor on the remote) — pass `--delete-branch=false` / omit branch deletion when merging a PR (e.g. `gh pr merge --merge`, not `--merge --delete-branch`). Keep the merged history browsable per phase.
 
 ## Logging to PROMPTS-HISTORY.txt
 
