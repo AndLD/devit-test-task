@@ -75,7 +75,7 @@ This repo follows a lightweight Git Flow. Any AI coding agent making commits mus
 
 ## Logging to PROMPTS-HISTORY.txt
 
-[PROMPTS-HISTORY.txt](PROMPTS-HISTORY.txt) is a running record of the user's own instructions to the AI agent throughout this project — kept separate from AI-WORKLOG.md, which records what the AI/candidate *did*, not what was *asked*. Every AI coding agent working in this repo must:
+[PROMPTS-HISTORY.txt](PROMPTS-HISTORY.txt) is a running record of the user's own instructions to the AI agent throughout this project — kept separate from AI-WORKLOG.md, which records what the AI/candidate _did_, not what was _asked_. Every AI coding agent working in this repo must:
 
 - Append each new message the user sends directly to the agent (chat instructions to Claude Code or any other AI tool used on this project), verbatim, as its own `Prompt No <n>` entry (incrementing from the last one in the file).
 - Only log the user's own words. Never log the agent's internal/system prompts, tool outputs, clarifying-question UI text, or its own responses.
