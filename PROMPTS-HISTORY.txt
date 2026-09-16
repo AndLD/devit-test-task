@@ -13,7 +13,7 @@ Also AGENTS.md should include instruction on how to log to AI-WORKLOG.md.
 
 So, introduce initial versions of AGENTS.md file, AI-WORKLOG.md file and README.md file (initial version for README.md may include some placeholders so it should kind of skeleton of future production-ready README file according to the requirements). And provide a development plan here and wait for my approvement.
 
-QUESTIONS/ANSWERS for Prompt 2:
+Q/A for Prompt 1:
 Given the 6-8h core time budget plus 4 bonus tasks (LLM integration, Shopify import, Design Tools, Infrastructure), how should we prioritize? All are non-trivial additions.
 
 Bonus tasks are not included into the given time budget 6-8h, so 6-8 is for core, and bonus tasks takes its own bonus time (not defined by the interviewer, but lets consider it like 2-3h).
@@ -34,3 +34,21 @@ OpenAI API
 For the 'Design Tools' bonus (full Figma/Stitch design transferred to code via AI), do you have an existing design ready?
 
 We will need to implement design (shadcn/ui based UI design) in Figma using Claude Design
+
+Prompt No 2
+I agree with the plan. Write this plan into separated file DEVELOPMENT-PLAN.md
+
+Prompt No 3
+Adjust the plan to include Access+Refresh tokens pattern into JWT auth implementation
+
+Prompt No 4
+Execute Phase 1
+
+Prompt No 5
+Commit the working tree changes with a sensible message.
+
+Prompt No 6
+Explain me why do we store refresh tokens to DB? Is it kind of sessions?
+
+Prompt No 7
+Please adjust the AGENTS.md or where it is more appropriate to do to make future committing changes align with Git Flow. Every development phase should be locked in separated branch. After it is completed, you make PR to main (or to "development" it would be better, lets keep main as for production, and make a diff branch for development)
