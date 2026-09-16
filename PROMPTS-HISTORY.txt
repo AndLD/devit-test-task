@@ -107,3 +107,14 @@ Now introduce validation error state for both desktop and mobile screens
 
 Prompt No 23
 I guess you missed recording my prompts to PROMPTS-HISTORY.txt. Check it out
+
+[Note: prompts 24-28 (Figma screen work + the "export code from Figma" question) were logged on the admin-ui branch, not yet merged into develop as of this branch. Numbering continues from 29 here to stay chronologically accurate; expect a merge conflict to resolve when both branches land.]
+
+Prompt No 29
+How you suggest to resolve missing-slug gap
+
+Prompt No 30
+Option B looks good. But what we would need to introduce some more public fields later on. It will make us add new fields twice. I do not ask to add new fields now. But how we can prevent such a problem?
+
+Prompt No 31
+Yes, implement it
