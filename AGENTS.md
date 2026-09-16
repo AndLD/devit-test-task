@@ -1,5 +1,15 @@
 # AGENTS.md
 
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
+
 This file is the single source of truth for **strategic decisions** on this project. Any AI coding agent (Claude Code, Cursor, Codex, Copilot, etc.) working in this repo must read this file first and follow it. When a new strategic decision is made during the project, it must be appended here (not just mentioned in chat) before or as part of the implementation that depends on it.
 
 ## Project
@@ -10,22 +20,22 @@ This file is the single source of truth for **strategic decisions** on this proj
 
 Where the requirements offered a choice, these are the decisions — do not substitute alternatives without updating this section:
 
-| Concern | Choice |
-|---|---|
-| Framework | Next.js (App Router) |
-| Language | TypeScript |
-| ORM | Prisma |
-| Database | PostgreSQL |
-| Validation | Zod |
-| Auth | JWT (custom, not a third-party auth provider), access+refresh token pattern: short-lived access token authorizes admin requests, longer-lived refresh token only mints new access tokens and is revoked on logout |
-| UI library | shadcn/ui (on top of Tailwind) |
-| Package manager | npm |
-| Linting/formatting | ESLint + Prettier |
-| Test runner | Jest |
-| Test DB strategy | Dockerized ephemeral PostgreSQL via `testcontainers` (real Postgres engine, spun up per test run, no cloud dependency, no API keys) |
-| Bonus LLM provider | OpenAI API (real mode), with a mocked/simulated response mode as the default so reviewers can run without an API key |
-| Infra bonus | Docker Compose (Postgres in Docker from day one; Next.js runs locally/un-dockerized during development) + CI (GitHub Actions: lint, test, build) |
-| Design bonus | Figma design (all screens/states, desktop+mobile) via Claude Design, transferred to shadcn/ui-based Next.js components with AI assistance |
+| Concern            | Choice                                                                                                                                                                                                            |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Framework          | Next.js (App Router)                                                                                                                                                                                              |
+| Language           | TypeScript                                                                                                                                                                                                        |
+| ORM                | Prisma                                                                                                                                                                                                            |
+| Database           | PostgreSQL                                                                                                                                                                                                        |
+| Validation         | Zod                                                                                                                                                                                                               |
+| Auth               | JWT (custom, not a third-party auth provider), access+refresh token pattern: short-lived access token authorizes admin requests, longer-lived refresh token only mints new access tokens and is revoked on logout |
+| UI library         | shadcn/ui (on top of Tailwind)                                                                                                                                                                                    |
+| Package manager    | npm                                                                                                                                                                                                               |
+| Linting/formatting | ESLint + Prettier                                                                                                                                                                                                 |
+| Test runner        | Jest                                                                                                                                                                                                              |
+| Test DB strategy   | Dockerized ephemeral PostgreSQL via `testcontainers` (real Postgres engine, spun up per test run, no cloud dependency, no API keys)                                                                               |
+| Bonus LLM provider | OpenAI API (real mode), with a mocked/simulated response mode as the default so reviewers can run without an API key                                                                                              |
+| Infra bonus        | Docker Compose (Postgres in Docker from day one; Next.js runs locally/un-dockerized during development) + CI (GitHub Actions: lint, test, build)                                                                  |
+| Design bonus       | Figma design (all screens/states, desktop+mobile) via Claude Design, transferred to shadcn/ui-based Next.js components with AI assistance                                                                         |
 
 ## Architectural principles
 

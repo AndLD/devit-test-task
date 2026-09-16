@@ -1,0 +1,9 @@
+node_modules
+.next
+src/generated
+prisma/migrations
+package-lock.json
+
+# Task-provided / personal files outside the app's own formatting scope
+PROJECT-REQUIREMENTS.md
+PROMPTS-HISTORY.txt

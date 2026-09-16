@@ -1,0 +1,62 @@
+// Prisma schema for Product Content Studio.
+// See AGENTS.md and DEVELOPMENT-PLAN.md for the strategic decisions behind this model.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum ProductStatus {
+  DRAFT
+  PUBLISHED
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  refreshTokens RefreshToken[]
+}
+
+// One row per issued refresh token, so logout / rotation can revoke a single
+// token instead of invalidating every session for the admin user.
+model RefreshToken {
+  id        String    @id @default(cuid())
+  tokenHash String    @unique
+  adminUser AdminUser @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
+  adminUserId String
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([adminUserId])
+}
+
+model Product {
+  id        String        @id @default(cuid())
+  slug      String        @unique
+
+  // Name and characteristics are seed-only in this task's scope: viewable
+  // everywhere, but not editable through the admin editor or its API.
+  name            String
+  characteristics Json
+
+  // Editable via the admin editor; see AGENTS.md for the length/non-empty
+  // constraints enforced by the shared Zod schema on both client and server.
+  description     String
+  seoTitle        String
+  seoDescription  String
+
+  status    ProductStatus @default(DRAFT)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([status])
+}

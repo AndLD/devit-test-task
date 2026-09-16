@@ -63,5 +63,5 @@ Design Tools bonus is folded into Phase 3 rather than deferred, since the core U
 
 ## Notes
 
-- This file captures the agreed *order and scope* of work. Any change to strategic decisions (stack, architecture principles, logging policy) is made in AGENTS.md, not here.
+- This file captures the agreed _order and scope_ of work. Any change to strategic decisions (stack, architecture principles, logging policy) is made in AGENTS.md, not here.
 - Progress against these phases, actual time spent, and any incomplete parts are tracked in README.md as implementation proceeds.

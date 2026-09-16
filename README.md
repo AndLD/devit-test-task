@@ -1,6 +1,6 @@
 # Product Content Studio
 
-> **Status: skeleton.** This README is a placeholder structure to be filled in as the project is implemented. See [AGENTS.md](AGENTS.md) for the strategic/technical decisions and development plan, and [AI-WORKLOG.md](AI-WORKLOG.md) for AI usage notes.
+> **Status: Phase 1 (scaffolding) complete.** Setup/run instructions below are accurate for the current state (placeholder pages only, no auth/data yet). Remaining sections are still placeholders — see [DEVELOPMENT-PLAN.md](DEVELOPMENT-PLAN.md) for what's next, [AGENTS.md](AGENTS.md) for the strategic/technical decisions, and [AI-WORKLOG.md](AI-WORKLOG.md) for AI usage notes.
 
 A small product-card editor for an online store: managers edit description/SEO fields and publish product cards in a private admin panel; visitors browse a public catalog of published products.
 
@@ -18,15 +18,16 @@ Full rationale for these choices lives in [AGENTS.md](AGENTS.md).
 
 ## Prerequisites
 
-- Node.js (version TBD)
+- Node.js **22.21.1** (see `.nvmrc` — run `nvm use` if you have nvm; Prisma 7 requires Node ^20.19/^22.12/>=24, which rules out plain Node 20.14/20.x-early)
 - npm
-- Docker (for local PostgreSQL via Docker Compose, and for running tests via testcontainers)
+- Docker (for local PostgreSQL via Docker Compose, and later for running integration tests via testcontainers)
 
 ## Getting started
 
-> _TODO: fill in once scaffolding lands._
-
 ```bash
+# 0. Use the expected Node version (if you use nvm)
+nvm use
+
 # 1. Install dependencies
 npm install
 
@@ -35,16 +36,17 @@ docker compose up -d
 
 # 3. Configure environment
 cp .env.example .env
+# then fill in JWT_ACCESS_SECRET / JWT_REFRESH_SECRET, e.g.:
+#   openssl rand -base64 48
 
-# 4. Apply DB schema & seed demo data (admin user + 3 demo products)
+# 4. Apply DB schema (seed script lands in Phase 2)
 npx prisma migrate dev
-npm run seed
 
 # 5. Run the app
 npm run dev
 ```
 
-App will be available at `http://localhost:3000` (TBD).
+The app is available at `http://localhost:3000`. Currently this only serves placeholder pages for every planned screen (public catalog `/`, public product page `/products/[slug]`, admin login `/admin/login`, admin product list `/admin/products`, admin product editor `/admin/products/[id]`) — no auth or data yet.
 
 ## Test admin credentials
 
@@ -67,12 +69,22 @@ npm test
 See `.env.example` for the full list (no real secrets committed). Expected variables include:
 
 - `DATABASE_URL` — PostgreSQL connection string
-- `JWT_SECRET` — signing secret for admin auth
+- `JWT_ACCESS_SECRET` / `JWT_REFRESH_SECRET` — signing secrets for the access+refresh token auth pattern
 - `OPENAI_API_KEY` — optional, only needed to exercise the real (non-mocked) LLM bonus feature
+- `SHOPIFY_STORE_DOMAIN` / `SHOPIFY_ADMIN_API_TOKEN` — optional, only needed for the Shopify import bonus feature
 
 ## Architecture notes
 
-> _TODO: brief overview of folder structure and layering (routes → services → repositories → Prisma), once implemented. Full principles in [AGENTS.md](AGENTS.md)._
+Current folder structure (Phase 1 scaffolding):
+
+- `src/app/` — Next.js App Router routes/pages (currently placeholders only).
+- `src/server/db/client.ts` — singleton Prisma Client, using the `@prisma/adapter-pg` driver adapter required by Prisma 7.
+- `src/server/{services,repositories,auth}/` — reserved for business logic and data access, kept separate from route handlers per the layering in [AGENTS.md](AGENTS.md) (populated starting Phase 2).
+- `src/lib/validation/` — Zod schemas shared by client forms and server API routes.
+- `src/lib/types/` — domain types decoupled from Prisma's generated types.
+- `prisma/schema.prisma` — `AdminUser`, `RefreshToken` (access+refresh JWT pattern), and `Product` models.
+
+Full principles in [AGENTS.md](AGENTS.md).
 
 ## Known limitations / incomplete parts
 
@@ -84,12 +96,12 @@ See `.env.example` for the full list (no real secrets committed). Expected varia
 
 ## Bonus features
 
-| Bonus | Status | Notes |
-|---|---|---|
-| LLM integration (OpenAI) | Not started | Mock mode will be the default for reviewers (no API key required); real-mode verification notes will go here. |
-| Shopify import | Not started | |
-| Design Tools (Figma → code) | Not started | Design link/export will be added here, with transfer confirmed in [AI-WORKLOG.md](AI-WORKLOG.md). |
-| Infrastructure (Docker Compose / CI) | Not started | |
+| Bonus                                | Status      | Notes                                                                                                         |
+| ------------------------------------ | ----------- | ------------------------------------------------------------------------------------------------------------- |
+| LLM integration (OpenAI)             | Not started | Mock mode will be the default for reviewers (no API key required); real-mode verification notes will go here. |
+| Shopify import                       | Not started |                                                                                                               |
+| Design Tools (Figma → code)          | Not started | Design link/export will be added here, with transfer confirmed in [AI-WORKLOG.md](AI-WORKLOG.md).             |
+| Infrastructure (Docker Compose / CI) | Not started |                                                                                                               |
 
 ## AI usage
 
