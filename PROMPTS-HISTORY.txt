@@ -79,3 +79,31 @@ Merge the PR please
 
 Prompt No 16
 For future: do not delete feature branches. Add it as instruction to AGENTS.md
+
+Prompt No 17
+Before we continue to Phase 3. I want to ask you:
+
+* I recently connected Figma MCP for you. Can you create page and draw directly on my Figma account now?
+
+* about cost of tokens for Claude Design specifically, because I have Claude Pro subscription and I am wondering: do I have enough quota limits to generate all necessary pages UI (so web screens + mobile screens) and will I be able to continue development just after this? Please list the pages we need UI design to be implemented, and evaluate how many tokens it will burn and how many usage of Claude I would still have afterwords for continue development.
+
+
+Do not generate UI yet. We just planning and evaluating
+
+Prompt No 18
+I want you to draw on Figma directly. Lets not take all 14 screens in one job. I want to see how it works generally and the final quality, so lets choose 1 screen to be implemented (so regular + main states, desktop + mobile). What screen can you suggest to take as first?
+
+Prompt No 19
+How much time it can take?
+
+Prompt No 20
+I want to see some result in few minutes max. So, lets change our plan for first screen. Generate just 1 web screen with no additional states.
+
+Prompt No 21
+Now generate mobile screen for the Admin login
+
+Prompt No 22
+Now introduce validation error state for both desktop and mobile screens
+
+Prompt No 23
+I guess you missed recording my prompts to PROMPTS-HISTORY.txt. Check it out
