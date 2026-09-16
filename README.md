@@ -11,6 +11,7 @@ A small product-card editor for an online store: managers edit description/SEO f
 - **Validation:** Zod
 - **Auth:** JWT
 - **UI:** shadcn/ui (Tailwind)
+- **Client-side HTTP:** axios (not native `fetch`) for all requests from the browser
 - **Testing:** Jest, with `testcontainers`-backed ephemeral PostgreSQL for integration tests
 - **Tooling:** ESLint + Prettier, npm
 

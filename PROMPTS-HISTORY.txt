@@ -143,3 +143,6 @@ How you think: we completed UI for admin side or anything left to do by the plan
 
 Prompt No 35
 Connect refresh endpoint. And add some spinner for loading (from shadcn probably)
+
+Prompt No 36
+My bad: I forgot to highlight that I want to use Axios instead of native fetch for all requests from client-side. Record it into tech stack please. And refactor all API requests on client side to turn fetch into axios

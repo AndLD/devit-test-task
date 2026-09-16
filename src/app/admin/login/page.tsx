@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
+import { apiClient } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
 
 export default function AdminLoginPage() {
@@ -20,14 +21,12 @@ export default function AdminLoginPage() {
     setPending(true);
     setError(null);
     try {
-      const res = await fetch("/api/admin/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+      const res = await apiClient.post("/api/admin/auth/login", {
+        email,
+        password,
       });
-      if (!res.ok) {
-        const data = await res.json().catch(() => null);
-        setError(data?.error ?? "Invalid email or password.");
+      if (res.status < 200 || res.status >= 300) {
+        setError(res.data?.error ?? "Invalid email or password.");
         return;
       }
       router.push("/admin/products");
