@@ -1,7 +1,8 @@
 import {
   productRepository,
   type ProductRepository,
-  type ProductListItem,
+  type AdminProductListItem,
+  type PublicProductListItem,
 } from "@/server/repositories/product-repository";
 import {
   productEditableFieldsSchema,
@@ -30,7 +31,7 @@ export class ProductService {
     private readonly products: ProductRepository = productRepository,
   ) {}
 
-  listForAdmin(): Promise<ProductListItem[]> {
+  listForAdmin(): Promise<AdminProductListItem[]> {
     return this.products.listAll();
   }
 
@@ -54,7 +55,7 @@ export class ProductService {
     return this.products.updateEditableFields(id, result.data);
   }
 
-  listPublished(): Promise<ProductListItem[]> {
+  listPublished(): Promise<PublicProductListItem[]> {
     return this.products.listPublished();
   }
 

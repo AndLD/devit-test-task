@@ -112,7 +112,6 @@ Full principles in [AGENTS.md](AGENTS.md).
 ## Known limitations / incomplete parts
 
 - **Public catalog/product pages are still placeholders.** The admin side (login, list, editor) is fully functional; the public-facing side is next.
-- **`ProductRepository.listPublished()` doesn't select `slug`** ([src/server/repositories/product-repository.ts](src/server/repositories/product-repository.ts)) — found while planning the public catalog. The public product page routes by slug, not id, so this needs a fix before the catalog UI can link to product pages. Not yet fixed.
 - No automated tests yet (Phase 5).
 
 ## Time spent

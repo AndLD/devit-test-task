@@ -123,7 +123,14 @@ Okay, now draw default state for desktop and mobile of Admin product editor
 Prompt No 28
 I think we can not wait till the Figma MCP reset or upgrade subscription. I want to export code of the screens we have created already and implement UI for them (the rest of the pages we will implement). How can I export the code from Figma?
 
-[Note: prompts 29-31 (the missing-slug gap fix) were logged on the product-list-types branch, not yet merged into develop as of this branch. Numbering continues from 32 here to stay chronologically accurate; expect a merge conflict to resolve when both branches land.]
+Prompt No 29
+How you suggest to resolve missing-slug gap
+
+Prompt No 30
+Option B looks good. But what we would need to introduce some more public fields later on. It will make us add new fields twice. I do not ask to add new fields now. But how we can prevent such a problem?
+
+Prompt No 31
+Yes, implement it
 
 Prompt No 32
 I want to test myself. Give me a workable link to admin products list

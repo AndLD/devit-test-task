@@ -33,16 +33,19 @@ function toDomainProduct(record: {
   };
 }
 
-export interface ProductListItem {
-  id: string;
-  name: string;
-  status: ProductStatus;
-}
+// Derived from the canonical `Product` type rather than declared from
+// scratch, so a field rename/removal on `Product` is a compile error here
+// too — the admin and public list contracts can't silently drift out of
+// sync with the domain model, even though they intentionally expose
+// different fields to each other (public should never gain admin-only
+// fields just because both views happened to grow the same field).
+export type AdminProductListItem = Pick<Product, "id" | "name" | "status">;
+export type PublicProductListItem = Pick<Product, "slug" | "name">;
 
 export class ProductRepository {
   constructor(private readonly db: PrismaClient = prisma) {}
 
-  async listAll(): Promise<ProductListItem[]> {
+  async listAll(): Promise<AdminProductListItem[]> {
     const records = await this.db.product.findMany({
       select: { id: true, name: true, status: true },
       orderBy: { name: "asc" },
@@ -55,13 +58,12 @@ export class ProductRepository {
     return record ? toDomainProduct(record) : null;
   }
 
-  async listPublished(): Promise<ProductListItem[]> {
-    const records = await this.db.product.findMany({
+  async listPublished(): Promise<PublicProductListItem[]> {
+    return this.db.product.findMany({
       where: { status: "PUBLISHED" },
-      select: { id: true, name: true, status: true },
+      select: { slug: true, name: true },
       orderBy: { name: "asc" },
     });
-    return records.map((r) => ({ ...r, status: r.status as ProductStatus }));
   }
 
   async findPublishedBySlug(slug: string): Promise<Product | null> {
