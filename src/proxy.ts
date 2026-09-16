@@ -22,14 +22,23 @@ async function hasValidAccessToken(request: NextRequest): Promise<boolean> {
 }
 
 export async function proxy(request: NextRequest) {
-  if (await hasValidAccessToken(request)) {
+  const isLoginPage = request.nextUrl.pathname === "/admin/login";
+  const authenticated = await hasValidAccessToken(request);
+
+  if (isLoginPage) {
+    if (authenticated) {
+      return NextResponse.redirect(new URL("/admin/products", request.url));
+    }
     return NextResponse.next();
   }
 
-  const loginUrl = new URL("/admin/login", request.url);
-  return NextResponse.redirect(loginUrl);
+  if (authenticated) {
+    return NextResponse.next();
+  }
+
+  return NextResponse.redirect(new URL("/admin/login", request.url));
 }
 
 export const config = {
-  matcher: ["/admin/((?!login).*)"],
+  matcher: ["/admin/:path*"],
 };

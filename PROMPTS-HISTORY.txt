@@ -149,3 +149,6 @@ My bad: I forgot to highlight that I want to use Axios instead of native fetch f
 
 Prompt No 37
 Lets continue Phase 4: we already implemented Admin side. Now we need to implement Public side pages
+
+Prompt No 38
+I found that login page is still available even when admin already authorized. It is not correct
