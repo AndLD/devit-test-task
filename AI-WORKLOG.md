@@ -5,7 +5,7 @@ This log records how AI tools were used throughout the development of Product Co
 ## Tools & models used
 
 | Tool                                                           | Model(s)                     | Role                                                                                       |
-| --------------------------------------------------------------- | ----------------------------- | --------------------------------------------------------------------------------------------- |
+| -------------------------------------------------------------- | ---------------------------- | ------------------------------------------------------------------------------------------ |
 | Claude Code                                                    | Sonnet 5 (`claude-sonnet-5`) | Primary AI pair-programmer: planning, scaffolding, implementation, tests, docs             |
 | Figma MCP (via Claude Code)                                    | —                            | UI design directly on the user's Figma account for the Design Tools bonus — see note below |
 | _(fill in others as used, e.g. Cursor/Copilot autocompletion)_ |                              |                                                                                            |
@@ -99,5 +99,13 @@ Notable AI-code decisions (the 2–3 examples required by the task) are marked w
 - **My contribution:** Caught the visual mismatch by actually running the app instead of trusting the code; reported it as a font issue without diagnosing the root cause, which Claude Code then found and fixed.
 - **Verification:** `npx tsc --noEmit`/`npm run lint`/`npm run build` clean. Visually re-verified in a live `next dev` session — the login and product list pages now render in Inter, matching the Figma screenshots, instead of the browser's default serif.
 - **Reference:** [src/app/layout.tsx](src/app/layout.tsx), [src/app/globals.css](src/app/globals.css)
+
+### 2026-09-17 — Fix: wire up the transparent refresh flow, add loading spinners
+
+- **Task:** The user asked for an honest completeness assessment of the admin UI. Claude Code flagged that the access+refresh JWT design (Phase 2, AGENTS.md) was never actually wired into the client: a 401 on save just showed a raw error instead of silently refreshing and retrying, and there was no route-level loading UI. The user asked to fix both.
+- **AI contribution:** Added `src/lib/authenticated-fetch.ts` — a `fetch` wrapper that retries once via `POST /api/admin/auth/refresh` on a 401, used by `ProductEditorForm`'s save call; on a 401 that survives the refresh attempt (refresh token itself dead), redirects to `/admin/login` instead of showing a confusing error. Added shadcn's `Spinner` component (`Loader2Icon` + `animate-spin`) to the login and save buttons' pending states, and `loading.tsx` route files for `/admin/products` and `/admin/products/[id]` for the page-navigation loading state.
+- **My contribution:** Asked for the completeness review that surfaced the gap, then asked specifically to connect the refresh endpoint and add a shadcn spinner rather than a custom one.
+- **Verification:** `npx tsc --noEmit`/`npm run lint`/`npm run build` clean. Verified the actual refresh flow end-to-end rather than just trusting the code: temporarily shortened the access-token TTL to 15 seconds in `tokens.ts`, logged in, waited past expiry while sitting on the editor page, then saved — confirmed via `read_network_requests` the exact sequence `PATCH → 401`, `POST /api/admin/auth/refresh → 200`, `PATCH → 200` (retried), the UI showed "Saved." with no visible error, and the new value was confirmed persisted via a direct `psql` query. TTL reverted to 15m and the test data reverted afterward.
+- **Reference:** [src/lib/authenticated-fetch.ts](src/lib/authenticated-fetch.ts), [src/components/admin/product-editor-form.tsx](src/components/admin/product-editor-form.tsx), [src/components/ui/spinner.tsx](src/components/ui/spinner.tsx)
 
 <!-- Further entries appended below as implementation proceeds. -->

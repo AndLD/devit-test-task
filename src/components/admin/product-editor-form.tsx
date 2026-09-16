@@ -5,7 +5,9 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
+import { authenticatedFetch } from "@/lib/authenticated-fetch";
 import { cn } from "@/lib/utils";
 import type { Product, ProductStatus } from "@/lib/types/product";
 
@@ -58,11 +60,26 @@ export function ProductEditorForm({ product }: { product: Product }) {
     setError(null);
     setJustSaved(false);
     try {
-      const res = await fetch(`/api/admin/products/${product.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ description, seoTitle, seoDescription, status }),
-      });
+      const res = await authenticatedFetch(
+        `/api/admin/products/${product.id}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            description,
+            seoTitle,
+            seoDescription,
+            status,
+          }),
+        },
+      );
+      if (res.status === 401) {
+        // The access token expired and the refresh attempt inside
+        // authenticatedFetch also failed (refresh token itself expired or
+        // was revoked elsewhere) — the session is genuinely over.
+        router.push("/admin/login");
+        return;
+      }
       const data = await res.json().catch(() => null);
       if (!res.ok) {
         setError(
@@ -163,6 +180,7 @@ export function ProductEditorForm({ product }: { product: Product }) {
           disabled={pending || !isValid}
           className="w-full sm:w-auto"
         >
+          {pending && <Spinner />}
           {pending ? "Saving…" : "Save changes"}
         </Button>
       </div>

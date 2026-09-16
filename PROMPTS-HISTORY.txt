@@ -137,3 +137,9 @@ I want to test myself. Give me a workable link to admin products list
 
 Prompt No 33
 Please fix the font. It should align with the UI design we made
+
+Prompt No 34
+How you think: we completed UI for admin side or anything left to do by the plan?
+
+Prompt No 35
+Connect refresh endpoint. And add some spinner for loading (from shadcn probably)

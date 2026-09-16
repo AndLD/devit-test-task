@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 
 export default function AdminLoginPage() {
@@ -93,6 +94,7 @@ export default function AdminLoginPage() {
         </div>
 
         <Button type="submit" disabled={pending} className="w-full">
+          {pending && <Spinner />}
           {pending ? "Signing in…" : "Sign in"}
         </Button>
       </form>
