@@ -62,6 +62,16 @@ Where the requirements offered a choice, these are the decisions — do not subs
 
 Any deviation from this order, or a new strategic decision made mid-implementation, must be reflected in this file.
 
+## Git workflow
+
+This repo follows a lightweight Git Flow. Any AI coding agent making commits must follow it — do not commit phase/feature work directly to `main` or `develop`.
+
+- **`main`** — production-ready snapshots only. It only receives merges from `develop` at meaningful milestones (e.g. "core functionality complete", final submission), never direct commits and never a feature branch merged straight in.
+- **`develop`** — integration branch for in-progress work. This is the default base for new branches and the target for phase PRs.
+- **Phase/feature branches** — one branch per development phase (or bonus task), branched from `develop`, named `phase-<n>-<short-slug>` for the numbered phases in [DEVELOPMENT-PLAN.md](DEVELOPMENT-PLAN.md) (e.g. `phase-2-backend-core`, `phase-3-design`) or `bonus-<slug>` for bonus work (e.g. `bonus-llm-integration`). All commits for that phase land here.
+- **Pull requests** — when a phase branch is complete (builds, lints, and its tests pass), open a PR into `develop`, not `main`. Merge `develop` into `main` only at a release milestone, via its own PR.
+- Keep phase branches scoped to their phase — don't bundle unrelated phases into one branch/PR, so review and AI-WORKLOG entries map cleanly to what shipped.
+
 ## Logging to AI-WORKLOG.md
 
 AI-WORKLOG.md tracks AI tool usage and decisions across the project, as required by the task. Every AI coding agent working in this repo must:
