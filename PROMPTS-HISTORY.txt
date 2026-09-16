@@ -146,3 +146,6 @@ Connect refresh endpoint. And add some spinner for loading (from shadcn probably
 
 Prompt No 36
 My bad: I forgot to highlight that I want to use Axios instead of native fetch for all requests from client-side. Record it into tech stack please. And refactor all API requests on client side to turn fetch into axios
+
+Prompt No 37
+Lets continue Phase 4: we already implemented Admin side. Now we need to implement Public side pages
