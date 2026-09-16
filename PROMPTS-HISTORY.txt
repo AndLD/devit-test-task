@@ -107,3 +107,18 @@ Now introduce validation error state for both desktop and mobile screens
 
 Prompt No 23
 I guess you missed recording my prompts to PROMPTS-HISTORY.txt. Check it out
+
+Prompt No 24
+Question: what the key diff between Admin product list and Public catalog except admin can view draft products and no in public?
+
+Prompt No 25
+Okay. Then draw desktop and mobile screen for Admin product list
+
+Prompt No 26
+Regarding desktop view of Admin products list, these long clickable rows look owful. Can you make shorter the width of products list items and keep list centered
+
+Prompt No 27
+Okay, now draw default state for desktop and mobile of Admin product editor
+
+Prompt No 28
+I think we can not wait till the Figma MCP reset or upgrade subscription. I want to export code of the screens we have created already and implement UI for them (the rest of the pages we will implement). How can I export the code from Figma?

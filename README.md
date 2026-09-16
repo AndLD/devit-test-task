@@ -1,6 +1,6 @@
 # Product Content Studio
 
-> **Status: Phase 2 (backend core) complete.** Auth, seed data, and the admin/public product APIs work end-to-end; UI pages are still placeholders (Phase 4, after the Phase 3 design pass). See [DEVELOPMENT-PLAN.md](DEVELOPMENT-PLAN.md) for what's next, [AGENTS.md](AGENTS.md) for the strategic/technical decisions, and [AI-WORKLOG.md](AI-WORKLOG.md) for AI usage notes.
+> **Status: admin UI (login, product list, product editor) implemented and working end-to-end.** Public catalog/product pages are still placeholders. See [DEVELOPMENT-PLAN.md](DEVELOPMENT-PLAN.md) for what's next, [AGENTS.md](AGENTS.md) for the strategic/technical decisions, and [AI-WORKLOG.md](AI-WORKLOG.md) for AI usage notes.
 
 A small product-card editor for an online store: managers edit description/SEO fields and publish product cards in a private admin panel; visitors browse a public catalog of published products.
 
@@ -49,7 +49,7 @@ npm run seed
 npm run dev
 ```
 
-The app is available at `http://localhost:3000`. Pages are still placeholders (UI wiring is Phase 4), but the backend is functional and can be exercised directly:
+The app is available at `http://localhost:3000`. Admin pages (`/admin/login`, `/admin/products`, `/admin/products/[id]`) are fully wired to the backend below; the public catalog and product page are still placeholders. The backend can also be exercised directly:
 
 - `GET /api/products` — published products only
 - `GET /api/products/[slug]` — a published product's full detail (404 for drafts or unknown slugs, including by direct URL)
@@ -95,7 +95,8 @@ See `.env.example` for the full list (no real secrets committed). Expected varia
 
 Current folder structure:
 
-- `src/app/` — Next.js App Router routes/pages (UI pages are still placeholders); `src/app/api/` holds the Route Handlers (`admin/auth/*`, `admin/products*`, `products*`).
+- `src/app/` — Next.js App Router routes/pages. Admin pages are fully implemented; the public catalog/product pages are still placeholders. `src/app/api/` holds the Route Handlers (`admin/auth/*`, `admin/products*`, `products*`).
+- `src/components/admin/` — `AdminTopBar`, `LogoutButton`, `StatusBadge`, `ProductEditorForm` (client component: character counters, Draft/Published toggle, save/error/loading states, never clears user edits on a failed save).
 - `src/proxy.ts` — Next.js Proxy (formerly "middleware"): stateless access-token check that redirects unauthenticated `/admin/*` page requests to `/admin/login`. Runs on the Edge runtime, so it does signature/expiry verification only — no DB access.
 - `src/server/db/client.ts` — singleton Prisma Client, using the `@prisma/adapter-pg` driver adapter required by Prisma 7.
 - `src/server/auth/` — `passwords.ts` (bcrypt hashing), `tokens.ts` (sign/verify access+refresh JWTs via `jose`, refresh-token hashing), `cookies.ts` (cookie read/write helpers), `guard.ts` (`requireAdminId()` used by admin Route Handlers).
@@ -110,7 +111,9 @@ Full principles in [AGENTS.md](AGENTS.md).
 
 ## Known limitations / incomplete parts
 
-> _TODO: list anything left unfinished or out of scope at submission time._
+- **Public catalog/product pages are still placeholders.** The admin side (login, list, editor) is fully functional; the public-facing side is next.
+- **`ProductRepository.listPublished()` doesn't select `slug`** ([src/server/repositories/product-repository.ts](src/server/repositories/product-repository.ts)) — found while planning the public catalog. The public product page routes by slug, not id, so this needs a fix before the catalog UI can link to product pages. Not yet fixed.
+- No automated tests yet (Phase 5).
 
 ## Time spent
 
@@ -118,12 +121,12 @@ Full principles in [AGENTS.md](AGENTS.md).
 
 ## Bonus features
 
-| Bonus                                | Status      | Notes                                                                                                         |
-| ------------------------------------ | ----------- | ------------------------------------------------------------------------------------------------------------- |
-| LLM integration (OpenAI)             | Not started | Mock mode will be the default for reviewers (no API key required); real-mode verification notes will go here. |
-| Shopify import                       | Not started |                                                                                                               |
-| Design Tools (Figma → code)          | Not started | Design link/export will be added here, with transfer confirmed in [AI-WORKLOG.md](AI-WORKLOG.md).             |
-| Infrastructure (Docker Compose / CI) | Not started |                                                                                                               |
+| Bonus                                | Status      | Notes                                                                                                                                                                                                                                                                                        |
+| ------------------------------------ | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| LLM integration (OpenAI)             | Not started | Mock mode will be the default for reviewers (no API key required); real-mode verification notes will go here.                                                                                                                                                                                |
+| Shopify import                       | Not started |                                                                                                                                                                                                                                                                                              |
+| Design Tools (Figma → code)          | In progress | [Figma file](https://www.figma.com/design/XEWl5YinPePK2aQajd9xE3) — Admin Login, Product List, Product Editor (desktop+mobile) designed and transferred to shadcn/ui components; see [AI-WORKLOG.md](AI-WORKLOG.md) for the transfer notes. Public catalog/product screens not yet designed. |
+| Infrastructure (Docker Compose / CI) | Not started |                                                                                                                                                                                                                                                                                              |
 
 ## AI usage
 
