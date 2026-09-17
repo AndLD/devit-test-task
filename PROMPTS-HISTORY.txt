@@ -282,3 +282,12 @@ what is better: to use version checker or to add "nvm use" just in seed script?
 
 Prompt No 57
 but version checker not lets me use any version to just run next app
+
+Prompt No 58
+what "nvm use" without specifying version as argument? It takes version from nvmrc?
+
+Prompt No 59
+Merge the PR
+
+Prompt No 60
+Execute Phase 6

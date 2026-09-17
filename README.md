@@ -1,6 +1,6 @@
 # Product Content Studio
 
-> **Status: core functionality complete — admin UI, public catalog/product pages, and automated tests (unit + testcontainers-backed integration) are all in place.** See [DEVELOPMENT-PLAN.md](DEVELOPMENT-PLAN.md) for what's next (bonus tasks), [AGENTS.md](AGENTS.md) for the strategic/technical decisions, and [AI-WORKLOG.md](AI-WORKLOG.md) for AI usage notes.
+> **Status: core functionality (Phases 1–6) complete** — admin UI, public catalog/product pages, and a full automated test suite (backend unit + testcontainers-backed integration, frontend component unit + integration, Cypress e2e) are all in place and passing. See [DEVELOPMENT-PLAN.md](DEVELOPMENT-PLAN.md) for what's next (bonus tasks), [AGENTS.md](AGENTS.md) for the strategic/technical decisions, and [AI-WORKLOG.md](AI-WORKLOG.md) for AI usage notes.
 
 A small product-card editor for an online store: managers edit description/SEO fields and publish product cards in a private admin panel; visitors browse a public catalog of published products.
 
@@ -19,7 +19,7 @@ Full rationale for these choices lives in [AGENTS.md](AGENTS.md).
 
 ## Prerequisites
 
-- Node.js **22.21.1** (see `.nvmrc` — run `nvm use` **in every new terminal/session**, since nvm doesn't persist it automatically; Prisma 7 requires Node ^20.19/^22.12/>=24, which rules out plain Node 20.14/20.x-early). `npm run dev`/`build`/`start`/`seed`/`test` all check this up front and fail with a clear message if you forgot — better than the cryptic `ERR_REQUIRE_ESM` crash you'd otherwise get from deep inside Prisma's tooling.
+- Node.js **22.21.1** (see `.nvmrc` — run `nvm use` **in every new terminal/session**, since nvm doesn't persist it automatically; with no argument, `nvm use` reads the version from `.nvmrc` in the current directory). `next dev`/`build`/`start` tolerate a wider range of Node versions, but `npm run seed` (and `test:e2e`, which reseeds first) needs Node ^20.19/^22.12/>=24 — Prisma 7's CLI tooling (`@prisma/dev`) breaks on older versions with a raw `ERR_REQUIRE_ESM` crash otherwise. `npm run seed` checks this up front and fails with a clear message if you forgot `nvm use`.
 - npm
 - Docker (for local PostgreSQL via Docker Compose, and later for running integration tests via testcontainers)
 
@@ -151,7 +151,17 @@ Full principles in [AGENTS.md](AGENTS.md).
 
 ## Time spent
 
-> _TODO: actual hours spent on core vs. bonus work, per task requirements._
+Derived from commit timestamps (`git log --all`) across one continuous session from 2026-09-16 20:04 to 2026-09-17 05:41 — **~9.5 hours total**, all on core functionality (no bonus work started yet, see below). This is wall-clock span across an AI pair-programming session (Claude Code), not a separately tracked stopwatch, so treat it as approximate:
+
+| Slice                                                                   | Approx. time |
+| ------------------------------------------------------------------------ | ------------ |
+| Planning (AGENTS.md/DEVELOPMENT-PLAN.md/AI-WORKLOG.md, Git Flow policy) + Phase 1 scaffolding | ~2h45m       |
+| Phase 2 — backend core (JWT auth, product APIs, seed)                    | ~1h          |
+| Phase 3 — design (Figma via MCP) + Phase 4 — UI implementation (admin + public) and the bugs found/fixed along the way | ~3h          |
+| Phase 5 — automated tests (backend unit/integration, frontend, Cypress e2e) + Node-version tooling fixes | ~1h45m       |
+| Phase 6 — this docs pass                                                 | ~1h          |
+
+This runs a bit past the 6–8h core budget in AGENTS.md, mainly because Phase 5's scope grew mid-project — frontend component tests and the Cypress e2e suite weren't in the original plan and were added after the fact (see AI-WORKLOG.md) once the backend-only test suite was flagged as incomplete.
 
 ## Bonus features
 

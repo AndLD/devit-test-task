@@ -4,11 +4,12 @@ This log records how AI tools were used throughout the development of Product Co
 
 ## Tools & models used
 
-| Tool                                                           | Model(s)                     | Role                                                                                       |
-| -------------------------------------------------------------- | ---------------------------- | ------------------------------------------------------------------------------------------ |
-| Claude Code                                                    | Sonnet 5 (`claude-sonnet-5`) | Primary AI pair-programmer: planning, scaffolding, implementation, tests, docs             |
-| Figma MCP (via Claude Code)                                    | —                            | UI design directly on the user's Figma account for the Design Tools bonus — see note below |
-| _(fill in others as used, e.g. Cursor/Copilot autocompletion)_ |                              |                                                                                            |
+| Tool                         | Model(s)                     | Role                                                                                       |
+| ---------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------ |
+| Claude Code                  | Sonnet 5 (`claude-sonnet-5`) | Primary AI pair-programmer: planning, scaffolding, implementation, tests, docs             |
+| Figma MCP (via Claude Code)  | —                             | UI design directly on the user's Figma account for the Design Tools bonus — see note below |
+
+No other AI coding tools were used on this project (no Cursor/Copilot autocompletion, etc.) — Claude Code was the sole AI pair-programmer throughout.
 
 > Originally planned to use Claude.ai's separate "Claude Design" canvas feature (see Prompt 1 in PROMPTS-HISTORY.txt), but the user connected a Figma MCP server to this Claude Code session instead (Prompt 17), which let Claude Code draw directly into the Figma file via the Plugin API — no separate Claude.ai session or quota involved. See the 2026-09-17 entries below.
 
@@ -27,6 +28,14 @@ Entries are appended chronologically (oldest first) as work happens — see [AGE
 ```
 
 Notable AI-code decisions (the 2–3 examples required by the task) are marked with **⭐ Notable decision** so they're easy to find.
+
+## Role of automated tests in verifying AI-generated code
+
+All code in this repository — application and tests alike — was written by Claude Code and reviewed/directed by the candidate; every "Verification" line in the entries below is how each change was actually checked, not just claimed. In summary:
+
+- **Every phase's code was verified against real infrastructure, not just by reading it or trusting green test output**: a real Docker Postgres for manual testing and the backend integration suite (via `testcontainers`), a real browser (screenshots, network logs, DOM reads) for UI/auth flows, and a real `next dev` server for the Cypress e2e suite. Several fixes (font loading, the transparent-refresh flow, the `/admin/login` redirect bug, the two bugs below) were found this way, not by code review.
+- **The automated tests themselves caught two real bugs that inspection had missed**, which is itself evidence they're doing real work rather than padding a coverage number: `LogoutButton`'s missing `catch` (an unhandled promise rejection on a failed logout, caught by a frontend integration test) and `GET /products/[slug]` returning HTTP 200 instead of 404 for a draft/unknown slug (an App Router streaming quirk, caught only by the Cypress e2e suite — the backend integration tests call Route Handlers directly with no live server, so they structurally couldn't have seen it). Both are detailed in their own entries below.
+- **Quality-checking the AI-written tests themselves**, not just trusting they pass: assertions were written (and reviewed) to check actual persisted state, not just response shape — e.g. the save-validation integration tests re-read the row via Prisma after a rejected `PATCH` to confirm it's genuinely unchanged, rather than only checking the 400 status; the frontend save-flow tests assert the input's DOM value is preserved after a rejected save, not just that an error message appeared. One bug in the tests themselves was caught this way too: an integration test asserted `toBeInstanceOf(Array)` on a JSON response body and failed even though the underlying behavior was correct, because Next's `Response`/JSON implementation crosses a realm boundary and the array isn't an instance of the test file's own `Array` constructor — fixed to `Array.isArray(...)` once the actual cause was understood, rather than loosening the assertion until it happened to pass.
 
 ---
 
@@ -198,5 +207,13 @@ Notable AI-code decisions (the 2–3 examples required by the task) are marked w
 - **My contribution:** Caught that the original guard was scoped too broadly by testing `npm run dev` themselves and noticing it worked despite the "unsupported" Node version.
 - **Verification:** Confirmed on Node 20.14.0: `npm run seed` still fails fast with the clear guard message; `npm run dev` starts normally and serves the app (`✓ Ready`, `GET /` reachable) with no guard interference. Switched back to Node 22.21.1 and confirmed `npm run seed` still works normally there too.
 - **Reference:** [package.json](package.json), [scripts/check-node-version.cjs](scripts/check-node-version.cjs)
+
+### 2026-09-17 — Phase 6: docs pass
+
+- **Task:** Finalize README.md (setup/run/test instructions, test admin credentials, architecture notes, known limitations, actual time spent) and bring AI-WORKLOG.md up to date, per DEVELOPMENT-PLAN.md's Phase 6.
+- **AI contribution:** Filled in README's "Time spent" TODO with an estimate derived from `git log --all` commit timestamps (~9.5h, slightly over the 6–8h core budget, mainly attributable to Phase 5's scope growing mid-project). Fixed a stale claim in the Prerequisites section (said `dev`/`build`/`start`/`seed`/`test` all check the Node version, which was true right after that guard was first added but became inaccurate once it was rescoped to `seed` only). Updated the top status banner to reflect Phases 1–6 complete. Removed a leftover "(fill in others as used...)" placeholder row from the AI-WORKLOG tools table (no other AI tools were actually used) and added a dedicated "Role of automated tests in verifying AI-generated code" section summarizing how tests were verified against real infrastructure, the two real bugs the test suites themselves caught, and how the AI-written test assertions were quality-checked (asserting persisted state, not just response shape).
+- **My contribution:** Directed the phase transition; no scope changes.
+- **Verification:** Read through README.md and AI-WORKLOG.md end to end for staleness (`grep -rn TODO` across all doc files came back empty afterward) rather than only appending new content.
+- **Reference:** [README.md](README.md), [AI-WORKLOG.md](AI-WORKLOG.md)
 
 <!-- Further entries appended below as implementation proceeds. -->
