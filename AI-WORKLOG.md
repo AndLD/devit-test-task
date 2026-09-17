@@ -183,4 +183,12 @@ Notable AI-code decisions (the 2–3 examples required by the task) are marked w
 - **Verification:** Manually switched to Node 20.14.0 and confirmed `npm run seed` now fails fast with the clear guard message instead of the original stack trace; switched back to 22.21.1 (`nvm use`) and confirmed `check-node` passes silently and `npm run seed`, `npx tsc --noEmit`, `npm run lint`, `npm run build`, and `npm run test:unit` all still work normally.
 - **Reference:** [scripts/check-node-version.cjs](scripts/check-node-version.cjs), [package.json](package.json), [.npmrc](.npmrc)
 
+### 2026-09-17 — Temporarily disabled the Node-version pre-hooks
+
+- **Task:** The user asked to temporarily disable the Node-version check just added to `dev`/`build`/`start`/`seed`/`test`.
+- **AI contribution:** Removed the `pre*` hook wiring (`predev`, `prebuild`, `prestart`, `preseed`, `pretest`) from `package.json` so those scripts run unchecked again, without deleting the underlying guard: `scripts/check-node-version.cjs`, the `check-node` script itself (still runnable manually), the `engines` field, and `.npmrc`'s `engine-strict=true` are all left in place so the check can be re-wired later by re-adding the `pre*` lines.
+- **My contribution:** Requested the temporary disable, presumably to unblock work on the wrong Node version without fighting the guard.
+- **Verification:** `package.json` still valid JSON; `npm run` script list confirmed to no longer include the `pre*` hooks.
+- **Reference:** [package.json](package.json)
+
 <!-- Further entries appended below as implementation proceeds. -->

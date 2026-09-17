@@ -264,3 +264,6 @@ Instead change the require of index.js in /Users/andrey/Documents/TestTaskProjec
 }
 
 Node.js v20.14.0```
+
+Prompt No 52
+Wait, can you please temporaly disable node version check you just added
