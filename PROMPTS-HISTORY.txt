@@ -337,3 +337,9 @@ Do not commit, wait for approve
 
 Prompt No 73
 Sync PROMPTS-HISTORY.txt
+
+Prompt No 74
+Project requirements have a requirement to provide a url to the design. So include a url to our partial UI design: https://www.figma.com/design/XEWl5YinPePK2aQajd9xE3/Product-Content-Studio-%E2%80%94-UI-Design?node-id=0-1&t=u1ntu3s3m0f4qGVE-1
+
+Prompt No 75
+Commit and merge the PR
