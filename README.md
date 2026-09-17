@@ -19,7 +19,7 @@ Full rationale for these choices lives in [AGENTS.md](AGENTS.md).
 
 ## Prerequisites
 
-- Node.js **22.21.1** (see `.nvmrc` — run `nvm use` if you have nvm; Prisma 7 requires Node ^20.19/^22.12/>=24, which rules out plain Node 20.14/20.x-early)
+- Node.js **22.21.1** (see `.nvmrc` — run `nvm use` **in every new terminal/session**, since nvm doesn't persist it automatically; Prisma 7 requires Node ^20.19/^22.12/>=24, which rules out plain Node 20.14/20.x-early). `npm run dev`/`build`/`start`/`seed`/`test` all check this up front and fail with a clear message if you forgot — better than the cryptic `ERR_REQUIRE_ESM` crash you'd otherwise get from deep inside Prisma's tooling.
 - npm
 - Docker (for local PostgreSQL via Docker Compose, and later for running integration tests via testcontainers)
 
