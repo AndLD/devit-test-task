@@ -12,7 +12,7 @@ A small product-card editor for an online store: managers edit description/SEO f
 - **Auth:** JWT
 - **UI:** shadcn/ui (Tailwind)
 - **Client-side HTTP:** axios (not native `fetch`) for all requests from the browser
-- **Testing:** Jest, with `testcontainers`-backed ephemeral PostgreSQL for integration tests
+- **Testing:** Jest (backend unit + integration, and frontend component unit + integration), with `testcontainers`-backed ephemeral PostgreSQL for backend integration tests, plus Cypress for end-to-end tests
 - **Tooling:** ESLint + Prettier, npm
 
 Full rationale for these choices lives in [AGENTS.md](AGENTS.md).
@@ -74,27 +74,43 @@ Not a real/production credential — it only exists in your local seeded databas
 ## Running tests
 
 ```bash
-npm test              # unit tests, then integration tests
-npm run test:unit         # fast, no DB, no Docker
-npm run test:integration  # spins up a real ephemeral Postgres via testcontainers (needs Docker running)
+npm test                       # backend unit, backend integration, then frontend unit + integration
+npm run test:unit               # backend business logic — fast, no DB, no Docker
+npm run test:integration        # backend Route Handlers — spins up a real ephemeral Postgres via testcontainers (needs Docker running)
+npm run test:frontend           # frontend component unit + integration tests (jsdom, no server, no DB)
+npm run test:frontend-unit
+npm run test:frontend-integration
+npm run test:e2e                # Cypress against a real `next dev` server and the Docker Compose Postgres (needs docker compose up + migrations already applied)
 ```
 
-Both suites are fully reproducible and need no external services or API keys — `test:integration` only needs a local Docker daemon, the same one used for `docker compose up`. No `.env` is required for tests: they use fixed test-only JWT secrets and a Postgres container testcontainers starts and tears down itself.
+All four Jest suites (`test:unit`, `test:integration`, `test:frontend-unit`, `test:frontend-integration`) are fully reproducible and need no external services or API keys — `test:integration` only needs a local Docker daemon, the same one used for `docker compose up`. No `.env` is required for them: they use fixed test-only JWT secrets and a Postgres container testcontainers starts and tears down itself.
 
-Jest runs under Node's native ESM support (`--experimental-vm-modules`, wired into both npm scripts) rather than the more common CommonJS + ts-jest setup — see the note at the top of [jest.config.js](jest.config.js): Prisma 7's generated client uses `import.meta.url` and `jose` ships ESM-only, both unusable under Jest's default CJS transform.
+`test:e2e` is the exception: it needs the Docker Compose Postgres already running with migrations applied (the normal "Getting started" setup), reseeds it (`npm run seed`, idempotent) before starting a real `next dev` server, then runs Cypress against it headlessly. Run `npm run cypress:open` instead for the interactive runner during development.
+
+Jest runs under Node's native ESM support (`--experimental-vm-modules`, wired into the backend npm scripts) rather than the more common CommonJS + ts-jest setup — see the note at the top of [jest.config.js](jest.config.js): Prisma 7's generated client uses `import.meta.url` and `jose` ships ESM-only, both unusable under Jest's default CJS transform. The frontend Jest projects don't need this — component code never imports Prisma or `jose` — so they use the plain CJS transform with `jest-environment-jsdom`.
 
 ## Testing strategy & rationale
 
-Two layers, matching the testability principle in [AGENTS.md](AGENTS.md):
+Four layers, matching the testability principle in [AGENTS.md](AGENTS.md):
 
-- **Unit tests** (`tests/unit/`) — no DB, no Next.js, no Docker. Cover the framework-free business logic that's injected with fake repositories instead of Prisma (`ProductService`, `AuthService`), the shared Zod validation schemas (field length limits, non-empty, status enum), JWT sign/verify round-trips and tamper rejection (`tokens.ts`), and password hashing (`passwords.ts`). This is only possible because the repository/service split in AGENTS.md makes every repository dependency an injectable, structurally-typed parameter — a fake object satisfying the same shape as `ProductRepository`/`AdminUserRepository`/`RefreshTokenRepository` is enough, no mocking framework needed.
-- **Integration tests** (`tests/integration/`) — exercise the actual Next.js Route Handlers (imported and invoked directly with a constructed `NextRequest`, no HTTP server needed) against a real, disposable PostgreSQL container per test run (`testcontainers`, migrated with `prisma migrate deploy`), truncated between tests. Nothing is mocked at the DB layer here. These cover the critical end-to-end scenarios named in AGENTS.md's Phase 5 plan:
+- **Backend unit tests** (`tests/unit/`) — no DB, no Next.js, no Docker. Cover the framework-free business logic that's injected with fake repositories instead of Prisma (`ProductService`, `AuthService`), the shared Zod validation schemas (field length limits, non-empty, status enum), JWT sign/verify round-trips and tamper rejection (`tokens.ts`), and password hashing (`passwords.ts`). This is only possible because the repository/service split in AGENTS.md makes every repository dependency an injectable, structurally-typed parameter — a fake object satisfying the same shape as `ProductRepository`/`AdminUserRepository`/`RefreshTokenRepository` is enough, no mocking framework needed.
+- **Backend integration tests** (`tests/integration/`) — exercise the actual Next.js Route Handlers (imported and invoked directly with a constructed `NextRequest`, no HTTP server needed) against a real, disposable PostgreSQL container per test run (`testcontainers`, migrated with `prisma migrate deploy`), truncated between tests. Nothing is mocked at the DB layer here. These cover the critical end-to-end scenarios named in AGENTS.md's Phase 5 plan:
   - **Draft invisibility** — the public API (`/api/products`, `/api/products/[slug]`) never returns a draft, whether listed or requested directly by slug (404, same as an unknown slug).
   - **Auth gating** — admin routes (`/api/admin/products`, `/api/admin/products/[id]`) 401 with no cookie, a garbage access token, or an expired session, and succeed with a valid one.
   - **Save validation** — an oversized description, an empty required field, etc. are rejected with 400 by the real API (not just the client form) and leave the stored row unchanged — verified by re-reading the row via Prisma after the rejected request.
   - **Refresh rotation** — a refresh token can only be used once; reusing an already-rotated-out token is rejected (replay protection), and logout revokes the current one.
+- **Frontend unit tests** (`tests/frontend-unit/`) — React Testing Library + `jsdom`, no HTTP layer touched at all. Cover `StatusBadge` (pure presentational) and `ProductEditorForm`'s client-side validation (Save disables/re-enables as fields cross the description/SEO-title/SEO-description limits), asserting along the way that typing or toggling status never calls the API.
+- **Frontend integration tests** (`tests/frontend-integration/`) — same tooling, but the HTTP layer (`@/lib/api-client`, `@/lib/authenticated-request`) and `next/navigation` are mocked with `jest.mock`, so a component's full interaction cycle can be driven without a real server: the login form (wrong password, success, network error), the product editor's save flow (success, server-rejected save with entered values preserved, session-expired redirect, network error), and the logout button (including that a failed logout request still navigates away — a real bug this test caught, see below).
+- **End-to-end tests** (`cypress/e2e/`) — Cypress against a real `next dev` server and the Docker Compose Postgres, covering the core flows for both sides:
+  - `admin.cy.ts` — wrong-password error, successful login, an authenticated session redirected away from `/admin/login`, an unauthenticated visit to `/admin/products` redirected to login, the product list showing both draft and published items, Save disabling on invalid input, saving a change and having it persist across reload, and logout.
+  - `public.cy.ts` — the catalog listing only published products, opening a product page and checking its content and `<title>` (SEO), and a draft 404ing by direct URL.
+  - `publish-status.cy.ts` — the cross-cutting flow: publishing a draft from the admin editor makes it appear in the public catalog, and unpublishing it removes it again. Self-healing (forces the fixture back to `DRAFT` first) and restores that state at the end, since `prisma/seed.ts`'s product upserts don't reset already-existing rows.
 
-One implementation change came out of writing these tests: `requireAdminId()` (`src/server/auth/guard.ts`) used to read the access token via `next/headers`' `cookies()`, which only works inside Next's own request-handling machinery — Route Handlers can't be invoked directly in a test that way. It now takes the `NextRequest` it's given and reads `request.cookies` instead, which is both more idiomatic for a Route Handler and makes it a plain, directly testable function of its input. See [AI-WORKLOG.md](AI-WORKLOG.md) for the full note.
+Two real bugs surfaced while writing these tests, not by inspection:
+
+- `requireAdminId()` (`src/server/auth/guard.ts`) used to read the access token via `next/headers`' `cookies()`, which only works inside Next's own request-handling machinery — Route Handlers couldn't be invoked directly in a backend integration test that way. It now takes the `NextRequest` it's given and reads `request.cookies` instead.
+- `LogoutButton` didn't catch a failed logout request, so a network error left an unhandled promise rejection even though navigation to `/admin/login` still happened via `finally` — caught by a frontend integration test simulating a rejected logout call, fixed by adding a `catch`.
+- The Cypress e2e suite also caught a case unit/integration tests structurally couldn't: `src/app/products/[slug]/page.tsx`'s `notFound()` call reliably rendered the right "not found" UI but with an HTTP **200** status, not 404 — Next can start streaming a dynamic page's response before the page's own data fetch resolves and throws, and the status can't change once streaming has begun (a known App Router/RSC behavior, not specific to this route — even Next's own "no route matched" 404 doesn't go through this code path). Fixed by moving the published/exists check to `src/proxy.ts` (Edge Middleware): it asks the already-correct `GET /api/products/[slug]` Route Handler via `fetch`, and on a miss, rewrites to a path that matches no route at all, reaching Next's built-in 404 handling (with a root-level `src/app/not-found.tsx`) before the page ever renders. This is exactly the workaround Next's own docs recommend for this trade-off, and it's the reason `test:integration`'s route-handler tests (which call handlers directly, no live server) couldn't have caught it — only a real running server, as Cypress uses, could.
 
 ## Environment variables
 
@@ -112,7 +128,8 @@ Current folder structure:
 - `src/app/` — Next.js App Router routes/pages. Admin pages and the public catalog (`/`) / product page (`/products/[slug]`) are fully implemented. `src/app/api/` holds the Route Handlers (`admin/auth/*`, `admin/products*`, `products*`).
 - `src/components/admin/` — `AdminTopBar`, `LogoutButton`, `StatusBadge`, `ProductEditorForm` (client component: character counters, Draft/Published toggle, save/error/loading states, never clears user edits on a failed save).
 - `src/components/public/` — `SiteHeader`, used by the public catalog and product pages.
-- `src/proxy.ts` — Next.js Proxy (formerly "middleware"): stateless access-token check that redirects unauthenticated `/admin/*` page requests to `/admin/login`. Runs on the Edge runtime, so it does signature/expiry verification only — no DB access.
+- `src/proxy.ts` — Next.js Proxy (formerly "middleware"): stateless access-token check that redirects unauthenticated `/admin/*` page requests to `/admin/login` (and an authenticated one away from `/admin/login`). Also guards `/products/[slug]`: since a page's own `notFound()` can't reliably produce a real 404 status (see Testing strategy above), it asks `GET /api/products/[slug]` via `fetch` and rewrites to an unmatched path on a miss. Runs on the Edge runtime — no direct DB access, hence the `fetch` to the API route instead of a repository call.
+- `src/app/not-found.tsx` — site-wide 404 UI, reached both by genuinely unmatched URLs and by the proxy's rewrite for a draft/unknown product slug.
 - `src/server/db/client.ts` — singleton Prisma Client, using the `@prisma/adapter-pg` driver adapter required by Prisma 7.
 - `src/server/auth/` — `passwords.ts` (bcrypt hashing), `tokens.ts` (sign/verify access+refresh JWTs via `jose`, refresh-token hashing), `cookies.ts` (cookie read/write helpers), `guard.ts` (`requireAdminId(request)` used by admin Route Handlers).
 - `src/server/repositories/` — thin Prisma wrappers (`AdminUserRepository`, `RefreshTokenRepository`, `ProductRepository`), the only layer that imports the generated Prisma client.
@@ -121,7 +138,9 @@ Current folder structure:
 - `src/lib/types/` — domain types decoupled from Prisma's generated types.
 - `prisma/schema.prisma` — `AdminUser`, `RefreshToken` (access+refresh JWT pattern), and `Product` models.
 - `prisma/seed.ts` — seeds the test admin and 3 demo products; idempotent (upserts), run via `npm run seed`.
-- `tests/unit/` — DB-free unit tests. `tests/integration/` — Route Handler tests against a real testcontainers Postgres; `tests/integration/support/` holds the container lifecycle (`global-setup.ts`/`global-teardown.ts`), per-test DB reset/seed helpers, and the `NextRequest` builder used to invoke handlers directly.
+- `tests/unit/` — DB-free backend unit tests. `tests/integration/` — Route Handler tests against a real testcontainers Postgres; `tests/integration/support/` holds the container lifecycle (`global-setup.ts`/`global-teardown.ts`), per-test DB reset/seed helpers, and the `NextRequest` builder used to invoke handlers directly.
+- `tests/frontend-unit/` / `tests/frontend-integration/` — React Testing Library component tests (`jsdom`); `tests/frontend-support/setup.ts` registers `@testing-library/jest-dom` matchers.
+- `cypress/e2e/` — end-to-end tests against a real running app; `cypress/support/commands.ts` has the shared `cy.loginAsAdmin()` helper.
 
 Full principles in [AGENTS.md](AGENTS.md).
 

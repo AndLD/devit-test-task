@@ -233,3 +233,11 @@ dyld[88087]: Symbol not found: __ZN6apache6thrift12ContextStack23createWithClien
 Watchman:  watchman --no-pretty get-sockname returned with exit code=null, signal=SIGABRT, stderr= dyld[88087]: Symbol not found: __ZN6apache6thrift12ContextStack23createWithClientContextERKNSt3__110shared_ptrINS2_6vectorINS3_INS0_22TProcessorEventHandlerEEENS2_9allocatorIS6_EEEEEERKNS3_INS4_INS3_INS0_21ClientInterceptorBaseEEENS7_ISE_EEEEEEPKcSL_RNS0_9transport7THeaderE
   Referenced from: <141A04D3-90F0-393A-AF51-5279D0FDA4D7> /opt/homebrew/Cellar/watchman/2024.11.25.00/bin/watchman
   Expected in:     <35A81A20-F4AF-3A41-99D7-8EB9CAD68842> /opt/homebrew/Cellar/fbthrift/2025.06.30.00/lib/libasync.1.0.0.dylib```
+
+Prompt No 49
+seems like you made tests only for Backend side? Or I am wrong?
+
+Prompt No 50
+I want you to create unit/integration tests for Frontend. And also make e2e tests with cypress to cover all core user flows (for both admin/public side).
+
+Adjust the Phase 5 in plan to include this as well

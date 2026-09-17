@@ -16,6 +16,13 @@ const esmTransform = {
   "^.+\\.tsx?$": ["ts-jest", { useESM: true }],
 };
 
+// Frontend component tests never import jose or the generated Prisma client
+// (those are server-only), so the plain CJS + ts-jest transform works fine —
+// no need for the ESM workaround the backend projects use.
+const cjsTransform = {
+  "^.+\\.tsx?$": ["ts-jest", {}],
+};
+
 /** @type {import('jest').Config} */
 module.exports = {
   // Watchman is only useful for --watch mode, not a one-shot `npm test` run,
@@ -45,6 +52,22 @@ module.exports = {
       globalTeardown: "<rootDir>/tests/integration/support/global-teardown.ts",
       setupFiles: ["<rootDir>/tests/integration/support/setup-env.ts"],
       testTimeout: 30000,
+    },
+    {
+      displayName: "frontend-unit",
+      transform: cjsTransform,
+      testEnvironment: "jsdom",
+      moduleNameMapper,
+      testMatch: ["<rootDir>/tests/frontend-unit/**/*.test.tsx"],
+      setupFilesAfterEnv: ["<rootDir>/tests/frontend-support/setup.ts"],
+    },
+    {
+      displayName: "frontend-integration",
+      transform: cjsTransform,
+      testEnvironment: "jsdom",
+      moduleNameMapper,
+      testMatch: ["<rootDir>/tests/frontend-integration/**/*.test.tsx"],
+      setupFilesAfterEnv: ["<rootDir>/tests/frontend-support/setup.ts"],
     },
   ],
 };
