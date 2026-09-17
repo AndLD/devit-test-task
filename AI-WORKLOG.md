@@ -153,4 +153,12 @@ Notable AI-code decisions (the 2–3 examples required by the task) are marked w
 - **Verification:** Confirmed `node_modules/ts-node` doesn't exist in this project (matching the user's failure). Re-ran `npm run test:unit` (39 passing) and `npm run test:integration` (16 passing, real testcontainers Postgres) with the new JS config and no `ts-node` installed. `npx tsc --noEmit`/`npm run lint` clean.
 - **Reference:** [jest.config.js](jest.config.js) (replaces the deleted `jest.config.ts`)
 
+### 2026-09-17 — Fix: `npm test` crashing via a broken local `watchman`
+
+- **Task:** After the previous fix, the user's `npm test` failed again — this time both `test:unit` and `test:integration` crashed with a `dyld` symbol-not-found error from their machine's Homebrew `watchman` binary (`fbthrift`/`watchman` version mismatch), which Jest shells out to by default to speed up file crawling.
+- **AI contribution:** Set `watchman: false` in `jest.config.js`. Watchman only helps `--watch` mode's incremental re-runs; a one-shot `npm test`/CI run gets no benefit from it and Jest's built-in file crawler works without it, so disabling it entirely sidesteps the user's broken local install rather than asking them to fix their Homebrew setup.
+- **My contribution:** Reported the exact crash output from their machine.
+- **Verification:** Ran `npm run test:unit` and `npm run test:integration` without the `--no-watchman` flag I'd been passing manually in this session — both pass (39 and 16 tests respectively) with no watchman invocation at all.
+- **Reference:** [jest.config.js](jest.config.js)
+
 <!-- Further entries appended below as implementation proceeds. -->

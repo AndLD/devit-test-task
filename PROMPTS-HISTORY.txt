@@ -199,3 +199,37 @@ Error: Cannot find package 'ts-node' imported from /Users/andrey/Documents/TestT
     at async runCLI (/Users/andrey/Documents/TestTaskProjects/devit-test-task/node_modules/@jest/core/build/index.js:1420:7)
     at async Object.run (/Users/andrey/Documents/TestTaskProjects/devit-test-task/node_modules/jest-cli/build/index.js:665:9)
 andrey@Andriis-Laptop devit-test-task % ```
+
+Prompt No 48
+Resolve the issue\
+
+```andrey@Andriis-Laptop devit-test-task % npm test
+
+> product-content-studio@0.1.0 test
+> npm run test:unit && npm run test:integration
+
+
+> product-content-studio@0.1.0 test:unit
+> node --experimental-vm-modules node_modules/.bin/jest --selectProjects unit
+
+Running one project: unit
+dyld[88009]: Symbol not found: __ZN6apache6thrift12ContextStack23createWithClientContextERKNSt3__110shared_ptrINS2_6vectorINS3_INS0_22TProcessorEventHandlerEEENS2_9allocatorIS6_EEEEEERKNS3_INS4_INS3_INS0_21ClientInterceptorBaseEEENS7_ISE_EEEEEEPKcSL_RNS0_9transport7THeaderE
+  Referenced from: <141A04D3-90F0-393A-AF51-5279D0FDA4D7> /opt/homebrew/Cellar/watchman/2024.11.25.00/bin/watchman
+  Expected in:     <35A81A20-F4AF-3A41-99D7-8EB9CAD68842> /opt/homebrew/Cellar/fbthrift/2025.06.30.00/lib/libasync.1.0.0.dylib
+
+Watchman:  watchman --no-pretty get-sockname returned with exit code=null, signal=SIGABRT, stderr= dyld[88009]: Symbol not found: __ZN6apache6thrift12ContextStack23createWithClientContextERKNSt3__110shared_ptrINS2_6vectorINS3_INS0_22TProcessorEventHandlerEEENS2_9allocatorIS6_EEEEEERKNS3_INS4_INS3_INS0_21ClientInterceptorBaseEEENS7_ISE_EEEEEEPKcSL_RNS0_9transport7THeaderE
+  Referenced from: <141A04D3-90F0-393A-AF51-5279D0FDA4D7> /opt/homebrew/Cellar/watchman/2024.11.25.00/bin/watchman
+  Expected in:     <35A81A20-F4AF-3A41-99D7-8EB9CAD68842> /opt/homebrew/Cellar/fbthrift/2025.06.30.00/lib/libasync.1.0.0.dylib
+
+
+> product-content-studio@0.1.0 test:integration
+> node --experimental-vm-modules node_modules/.bin/jest --selectProjects integration --runInBand
+
+Running one project: integration
+dyld[88087]: Symbol not found: __ZN6apache6thrift12ContextStack23createWithClientContextERKNSt3__110shared_ptrINS2_6vectorINS3_INS0_22TProcessorEventHandlerEEENS2_9allocatorIS6_EEEEEERKNS3_INS4_INS3_INS0_21ClientInterceptorBaseEEENS7_ISE_EEEEEEPKcSL_RNS0_9transport7THeaderE
+  Referenced from: <141A04D3-90F0-393A-AF51-5279D0FDA4D7> /opt/homebrew/Cellar/watchman/2024.11.25.00/bin/watchman
+  Expected in:     <35A81A20-F4AF-3A41-99D7-8EB9CAD68842> /opt/homebrew/Cellar/fbthrift/2025.06.30.00/lib/libasync.1.0.0.dylib
+
+Watchman:  watchman --no-pretty get-sockname returned with exit code=null, signal=SIGABRT, stderr= dyld[88087]: Symbol not found: __ZN6apache6thrift12ContextStack23createWithClientContextERKNSt3__110shared_ptrINS2_6vectorINS3_INS0_22TProcessorEventHandlerEEENS2_9allocatorIS6_EEEEEERKNS3_INS4_INS3_INS0_21ClientInterceptorBaseEEENS7_ISE_EEEEEEPKcSL_RNS0_9transport7THeaderE
+  Referenced from: <141A04D3-90F0-393A-AF51-5279D0FDA4D7> /opt/homebrew/Cellar/watchman/2024.11.25.00/bin/watchman
+  Expected in:     <35A81A20-F4AF-3A41-99D7-8EB9CAD68842> /opt/homebrew/Cellar/fbthrift/2025.06.30.00/lib/libasync.1.0.0.dylib```

@@ -18,6 +18,11 @@ const esmTransform = {
 
 /** @type {import('jest').Config} */
 module.exports = {
+  // Watchman is only useful for --watch mode, not a one-shot `npm test` run,
+  // and a broken/mismatched local watchman install (a known issue on some
+  // Homebrew setups) otherwise makes Jest hang or crash before running
+  // anything. Jest's own file crawler works fine without it.
+  watchman: false,
   projects: [
     {
       displayName: "unit",
