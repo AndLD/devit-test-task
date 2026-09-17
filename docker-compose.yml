@@ -16,5 +16,51 @@ services:
       timeout: 5s
       retries: 10
 
+  # One-off job: applies migrations and seeds the test admin/demo products,
+  # then exits. `web` waits for it to complete successfully before starting.
+  # Uses the `builder` stage (has the Prisma CLI and tsx, unlike the lean
+  # runtime image `web` uses) rather than a separate Dockerfile.
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    command: sh -c "npx prisma migrate deploy && npm run seed"
+    environment:
+      # Points at the `postgres` service by its Compose network hostname,
+      # not localhost — this overrides whatever DATABASE_URL is in .env,
+      # which is set up for connecting from the host machine during
+      # un-dockerized `npm run dev` (see AGENTS.md).
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/product_content_studio?schema=public
+    env_file:
+      - path: .env
+        required: false
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Runs the full app itself. Development still happens via `npm run dev`
+  # against this same `postgres` service (see AGENTS.md) — this service is
+  # for running/verifying the whole containerized stack, e.g. `docker
+  # compose up`.
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/product_content_studio?schema=public
+      NODE_ENV: production
+    env_file:
+      - path: .env
+        required: false
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
 volumes:
   postgres_data:

@@ -62,6 +62,16 @@ The app is available at `http://localhost:3000`. Admin pages (`/admin/login`, `/
 - `PATCH /api/admin/products/[id]` — update `description`/`seoTitle`/`seoDescription`/`status` (Zod-validated server-side, same limits as the editor); requires auth
 - `/admin/*` pages (except `/admin/login`) redirect to `/admin/login` without a valid access token
 
+## Running the whole app via Docker Compose
+
+The steps above run Postgres in Docker and Next.js locally (the normal way to develop this project — see AGENTS.md). `docker compose up` can also run the entire app in containers, useful for verifying the whole stack without a local Node install:
+
+```bash
+docker compose up --build
+```
+
+This starts three services: `postgres` (same as above), a one-off `migrate` job that applies migrations and seeds the test admin/demo products then exits, and `web` (the Next.js app itself, built via the multi-stage [Dockerfile](Dockerfile) using `next.config.ts`'s `output: "standalone"`) — available at `http://localhost:3000` once `migrate` finishes successfully. JWT secrets are read from your `.env` if present (see Environment variables below); `DATABASE_URL` is fixed to point at the `postgres` service by its Compose network hostname rather than `localhost`, so it doesn't need to be (and isn't) read from `.env` for these two services.
+
 ## Test admin credentials
 
 Seeded by `npm run seed` (override via `SEED_ADMIN_EMAIL`/`SEED_ADMIN_PASSWORD` in `.env` before seeding):
@@ -88,6 +98,8 @@ All four Jest suites (`test:unit`, `test:integration`, `test:frontend-unit`, `te
 `test:e2e` is the exception: it needs the Docker Compose Postgres already running with migrations applied (the normal "Getting started" setup), reseeds it (`npm run seed`, idempotent) before starting a real `next dev` server, then runs Cypress against it headlessly. Run `npm run cypress:open` instead for the interactive runner during development.
 
 Jest runs under Node's native ESM support (`--experimental-vm-modules`, wired into the backend npm scripts) rather than the more common CommonJS + ts-jest setup — see the note at the top of [jest.config.js](jest.config.js): Prisma 7's generated client uses `import.meta.url` and `jose` ships ESM-only, both unusable under Jest's default CJS transform. The frontend Jest projects don't need this — component code never imports Prisma or `jose` — so they use the plain CJS transform with `jest-environment-jsdom`.
+
+All of this — lint, both `tsc --noEmit` targets, build, all four Jest suites, and the Cypress e2e suite — also runs in CI on every push and pull request ([.github/workflows/ci.yml](.github/workflows/ci.yml)), each as its own job so a failure is easy to pinpoint.
 
 ## Testing strategy & rationale
 
@@ -141,6 +153,8 @@ Current folder structure:
 - `tests/unit/` — DB-free backend unit tests. `tests/integration/` — Route Handler tests against a real testcontainers Postgres; `tests/integration/support/` holds the container lifecycle (`global-setup.ts`/`global-teardown.ts`), per-test DB reset/seed helpers, and the `NextRequest` builder used to invoke handlers directly.
 - `tests/frontend-unit/` / `tests/frontend-integration/` — React Testing Library component tests (`jsdom`); `tests/frontend-support/setup.ts` registers `@testing-library/jest-dom` matchers.
 - `cypress/e2e/` — end-to-end tests against a real running app; `cypress/support/commands.ts` has the shared `cy.loginAsAdmin()` helper.
+- `Dockerfile` — multi-stage build for the `web` service in `docker-compose.yml` (a `deps`/`builder` stage with the full toolchain, and a lean `runner` stage using `next.config.ts`'s `output: "standalone"`).
+- `.github/workflows/ci.yml` — lint, both `tsc --noEmit` targets, build, all four Jest suites, and the Cypress e2e suite, each as a separate job, on every push and PR.
 
 Full principles in [AGENTS.md](AGENTS.md).
 
@@ -181,7 +195,7 @@ Phase 3 (design) was originally miscounted into the core total in an earlier dra
 | LLM integration (OpenAI)             | Not started | Mock mode will be the default for reviewers (no API key required); real-mode verification notes will go here.                                                                                                                                                                                |
 | Shopify import                       | Not started |                                                                                                                                                                                                                                                                                              |
 | Design Tools (Figma → code)          | In progress (~1h of the ~2–3h bonus budget) | [Figma file](https://www.figma.com/design/XEWl5YinPePK2aQajd9xE3/Product-Content-Studio-%E2%80%94-UI-Design?node-id=0-1&t=u1ntu3s3m0f4qGVE-1) — Admin Login, Product List, Product Editor (desktop+mobile) designed and transferred to shadcn/ui components; see [AI-WORKLOG.md](AI-WORKLOG.md) for the transfer notes. Public catalog/product pages were built directly in code (reusing the same design language) rather than designed in Figma first. |
-| Infrastructure (Docker Compose / CI) | Not started |                                                                                                                                                                                                                                                                                              |
+| Infrastructure (Docker Compose / CI) | Done | `docker compose up` now runs the whole app (Postgres + a one-off `migrate` job + the Next.js app itself), not just the database — see "Running the whole app via Docker Compose" below. GitHub Actions CI ([.github/workflows/ci.yml](.github/workflows/ci.yml)) runs on every push/PR: lint, both `tsc --noEmit` targets, build, all four Jest suites (backend unit/integration via testcontainers, frontend unit/integration), and the Cypress e2e suite against a Postgres service container. |
 
 ## AI usage
 
