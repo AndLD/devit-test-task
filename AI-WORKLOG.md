@@ -191,4 +191,12 @@ Notable AI-code decisions (the 2–3 examples required by the task) are marked w
 - **Verification:** `package.json` still valid JSON; `npm run` script list confirmed to no longer include the `pre*` hooks.
 - **Reference:** [package.json](package.json)
 
+### 2026-09-17 — Re-scoped the Node-version guard to `seed` only
+
+- **Task:** After explaining the `ERR_REQUIRE_ESM` root cause (Node's `require(esm)` support, needed only by `prisma db seed`'s `@prisma/dev` dependency, not by the app itself) and comparing the version-checker approach against baking `nvm use` into scripts (rejected: `nvm` is a shell function sourced from `.bashrc`/`.zshrc`, not visible to the plain `sh -c` subshell npm scripts run in, and it's nvm-specific), the user pointed out that the previously-disabled guard, if re-enabled as it was, would have blocked `dev`/`build`/`start`/`test` too — even though their own `npm run dev` had already run fine on Node 20.14.
+- **AI contribution:** Re-added the `check-node` pre-hook to `seed` only (`preseed`), not `dev`/`build`/`start`/`test` — the only npm script confirmed to actually touch the Node-version-sensitive code path. Updated the guard script's comment to state this scoping explicitly, so a future edit doesn't casually re-broaden it.
+- **My contribution:** Caught that the original guard was scoped too broadly by testing `npm run dev` themselves and noticing it worked despite the "unsupported" Node version.
+- **Verification:** Confirmed on Node 20.14.0: `npm run seed` still fails fast with the clear guard message; `npm run dev` starts normally and serves the app (`✓ Ready`, `GET /` reachable) with no guard interference. Switched back to Node 22.21.1 and confirmed `npm run seed` still works normally there too.
+- **Reference:** [package.json](package.json), [scripts/check-node-version.cjs](scripts/check-node-version.cjs)
+
 <!-- Further entries appended below as implementation proceeds. -->

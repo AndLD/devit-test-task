@@ -267,3 +267,18 @@ Node.js v20.14.0```
 
 Prompt No 52
 Wait, can you please temporaly disable node version check you just added
+
+Prompt No 53
+I found that right now if I run "npm run test:e2e" it fails with ESM problem (as before), but if I run "nvm use && npm run test:e2e", it works okay. Why?
+
+Prompt No 54
+But why next project run fine, but e2e tests fails with ESM
+
+Prompt No 55
+wait, you want to say seed would not work the same as the e2e tests?
+
+Prompt No 56
+what is better: to use version checker or to add "nvm use" just in seed script?
+
+Prompt No 57
+but version checker not lets me use any version to just run next app
