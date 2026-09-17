@@ -1,6 +1,6 @@
 # Product Content Studio
 
-> **Status: core functionality complete — admin UI, public catalog/product pages, and automated tests (unit + testcontainers-backed integration) are all in place.** See [DEVELOPMENT-PLAN.md](DEVELOPMENT-PLAN.md) for what's next (bonus tasks), [AGENTS.md](AGENTS.md) for the strategic/technical decisions, and [AI-WORKLOG.md](AI-WORKLOG.md) for AI usage notes.
+> **Status: core functionality (Phases 1–6) complete** — admin UI, public catalog/product pages, and a full automated test suite (backend unit + testcontainers-backed integration, frontend component unit + integration, Cypress e2e) are all in place and passing. See [DEVELOPMENT-PLAN.md](DEVELOPMENT-PLAN.md) for what's next (bonus tasks), [AGENTS.md](AGENTS.md) for the strategic/technical decisions, and [AI-WORKLOG.md](AI-WORKLOG.md) for AI usage notes.
 
 A small product-card editor for an online store: managers edit description/SEO fields and publish product cards in a private admin panel; visitors browse a public catalog of published products.
 
@@ -19,7 +19,7 @@ Full rationale for these choices lives in [AGENTS.md](AGENTS.md).
 
 ## Prerequisites
 
-- Node.js **22.21.1** (see `.nvmrc` — run `nvm use` **in every new terminal/session**, since nvm doesn't persist it automatically; Prisma 7 requires Node ^20.19/^22.12/>=24, which rules out plain Node 20.14/20.x-early). `npm run dev`/`build`/`start`/`seed`/`test` all check this up front and fail with a clear message if you forgot — better than the cryptic `ERR_REQUIRE_ESM` crash you'd otherwise get from deep inside Prisma's tooling.
+- Node.js **22.21.1** (see `.nvmrc` — run `nvm use` **in every new terminal/session**, since nvm doesn't persist it automatically; with no argument, `nvm use` reads the version from `.nvmrc` in the current directory). `next dev`/`build`/`start` tolerate a wider range of Node versions, but `npm run seed` (and `test:e2e`, which reseeds first) needs Node ^20.19/^22.12/>=24 — Prisma 7's CLI tooling (`@prisma/dev`) breaks on older versions with a raw `ERR_REQUIRE_ESM` crash otherwise. `npm run seed` checks this up front and fails with a clear message if you forgot `nvm use`.
 - npm
 - Docker (for local PostgreSQL via Docker Compose, and later for running integration tests via testcontainers)
 
@@ -151,7 +151,28 @@ Full principles in [AGENTS.md](AGENTS.md).
 
 ## Time spent
 
-> _TODO: actual hours spent on core vs. bonus work, per task requirements._
+Tracked attentively in Clockify (not estimated from commit timestamps — an earlier draft of this section did that and undercounted real elapsed time, since it couldn't see breaks between work sessions). Per-phase durations below are exact where a logged time entry maps to a single phase; where one entry spans multiple activities (e.g. "Execute Phase 4 + Fix missing-slug + ... + Execute Phase 5"), its duration is split evenly across the number of distinct activities named, since Clockify's summary export doesn't sub-divide a single entry further.
+
+**Core budget (target: 6–8h):**
+
+| Phase                                                    | Time         |
+| --------------------------------------------------------- | ------------ |
+| Planning & AI harness setup (AGENTS.md/DEVELOPMENT-PLAN.md/AI-WORKLOG.md, Git Flow policy, harness corrections) | 2h58m50s     |
+| Phase 1 — scaffolding                                      | 53m43s       |
+| Phase 2 — backend core (JWT auth, product APIs, seed)       | 33m55s       |
+| Phase 4 — UI implementation (admin + public) + the missing-slug fix, token-refresh wiring, and axios migration done along the way | 1h17m54s     |
+| Phase 5 — automated tests (backend + frontend + Cypress e2e) and the Node-version/ESM tooling fixes | 1h56m42s     |
+| **Core total (through Phase 5)**                           | **7h41m04s** |
+
+This fits inside the 6–8h core budget in AGENTS.md, though Phase 6 (this docs pass) isn't included above — it wasn't logged in Clockify separately in time to make this report, so actual core time is somewhat higher once it's added.
+
+**Bonus budget (separate target: ~2–3h, not counted against the core budget above):**
+
+| Bonus                          | Time     |
+| ------------------------------- | -------- |
+| Design Tools (Phase 3 — Figma via MCP) | 1h00m43s |
+
+Phase 3 (design) was originally miscounted into the core total in an earlier draft of this section — Design Tools is a bonus item per PROJECT-REQUIREMENTS.md, not part of the core admin/public/tests scope, so its time belongs in the bonus budget instead. See Bonus features below for status of the other bonus tasks (none started).
 
 ## Bonus features
 
@@ -159,7 +180,7 @@ Full principles in [AGENTS.md](AGENTS.md).
 | ------------------------------------ | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | LLM integration (OpenAI)             | Not started | Mock mode will be the default for reviewers (no API key required); real-mode verification notes will go here.                                                                                                                                                                                |
 | Shopify import                       | Not started |                                                                                                                                                                                                                                                                                              |
-| Design Tools (Figma → code)          | In progress | [Figma file](https://www.figma.com/design/XEWl5YinPePK2aQajd9xE3) — Admin Login, Product List, Product Editor (desktop+mobile) designed and transferred to shadcn/ui components; see [AI-WORKLOG.md](AI-WORKLOG.md) for the transfer notes. Public catalog/product pages were built directly in code (reusing the same design language) rather than designed in Figma first. |
+| Design Tools (Figma → code)          | In progress (~1h of the ~2–3h bonus budget) | [Figma file](https://www.figma.com/design/XEWl5YinPePK2aQajd9xE3/Product-Content-Studio-%E2%80%94-UI-Design?node-id=0-1&t=u1ntu3s3m0f4qGVE-1) — Admin Login, Product List, Product Editor (desktop+mobile) designed and transferred to shadcn/ui components; see [AI-WORKLOG.md](AI-WORKLOG.md) for the transfer notes. Public catalog/product pages were built directly in code (reusing the same design language) rather than designed in Figma first. |
 | Infrastructure (Docker Compose / CI) | Not started |                                                                                                                                                                                                                                                                                              |
 
 ## AI usage

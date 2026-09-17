@@ -4,11 +4,12 @@ This log records how AI tools were used throughout the development of Product Co
 
 ## Tools & models used
 
-| Tool                                                           | Model(s)                     | Role                                                                                       |
-| -------------------------------------------------------------- | ---------------------------- | ------------------------------------------------------------------------------------------ |
-| Claude Code                                                    | Sonnet 5 (`claude-sonnet-5`) | Primary AI pair-programmer: planning, scaffolding, implementation, tests, docs             |
-| Figma MCP (via Claude Code)                                    | —                            | UI design directly on the user's Figma account for the Design Tools bonus — see note below |
-| _(fill in others as used, e.g. Cursor/Copilot autocompletion)_ |                              |                                                                                            |
+| Tool                         | Model(s)                     | Role                                                                                       |
+| ---------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------ |
+| Claude Code                  | Sonnet 5 (`claude-sonnet-5`) | Primary AI pair-programmer: planning, scaffolding, implementation, tests, docs             |
+| Figma MCP (via Claude Code)  | —                             | UI design directly on the user's Figma account for the Design Tools bonus — see note below |
+
+No other AI coding tools were used on this project (no Cursor/Copilot autocompletion, etc.) — Claude Code was the sole AI pair-programmer throughout.
 
 > Originally planned to use Claude.ai's separate "Claude Design" canvas feature (see Prompt 1 in PROMPTS-HISTORY.txt), but the user connected a Figma MCP server to this Claude Code session instead (Prompt 17), which let Claude Code draw directly into the Figma file via the Plugin API — no separate Claude.ai session or quota involved. See the 2026-09-17 entries below.
 
@@ -28,11 +29,27 @@ Entries are appended chronologically (oldest first) as work happens — see [AGE
 
 Notable AI-code decisions (the 2–3 examples required by the task) are marked with **⭐ Notable decision** so they're easy to find.
 
+## Role of automated tests in verifying AI-generated code
+
+All code in this repository — application and tests alike — was written by Claude Code and reviewed/directed by the candidate; every "Verification" line in the entries below is how each change was actually checked, not just claimed.
+
+### How automated tests verified AI-generated code
+
+Every phase's code was verified against real infrastructure, not just by reading it or trusting green test output: a real Docker Postgres for manual testing and the backend integration suite (via `testcontainers`), a real browser (screenshots, network logs, DOM reads) for UI/auth flows, and a real `next dev` server for the Cypress e2e suite. Several fixes (font loading, the transparent-refresh flow, the `/admin/login` redirect bug, the two bugs below) were found this way, not by code review.
+
+The automated tests themselves caught two real bugs that inspection had missed, which is itself evidence they're doing real work rather than padding a coverage number: `LogoutButton`'s missing `catch` (an unhandled promise rejection on a failed logout, caught by a frontend integration test) and `GET /products/[slug]` returning HTTP 200 instead of 404 for a draft/unknown slug (an App Router streaming quirk, caught only by the Cypress e2e suite — the backend integration tests call Route Handlers directly with no live server, so they structurally couldn't have seen it). Both are detailed in their own entries below.
+
+### Quality assessment of the AI-written tests themselves
+
+The AI-written test assertions were quality-checked, not just trusted because they passed: they were written (and reviewed) to check actual persisted state, not just response shape — e.g. the save-validation integration tests re-read the row via Prisma after a rejected `PATCH` to confirm it's genuinely unchanged, rather than only checking the 400 status; the frontend save-flow tests assert the input's DOM value is preserved after a rejected save, not just that an error message appeared.
+
+One bug in the tests themselves was caught this way too: an integration test asserted `toBeInstanceOf(Array)` on a JSON response body and failed even though the underlying behavior was correct, because Next's `Response`/JSON implementation crosses a realm boundary and the array isn't an instance of the test file's own `Array` constructor. It was fixed to `Array.isArray(...)` once the actual cause was understood, rather than loosened until it happened to pass — a concrete example of the AI-written tests being debugged and corrected, not just generated and left as-is.
+
 ---
 
 ## Entries
 
-### 2026-09-16 — Planning: stack, architecture, and development order
+### 2026-09-14 to 2026-09-16 — Planning: stack, architecture, and development order
 
 - **Task:** Kick off the project by reading PROJECT-REQUIREMENTS.md, choosing technologies from the options offered, and defining strategic decisions (architecture principles, test strategy, bonus scope/order) before any code is written.
 - **AI contribution:** Claude Code read the requirements, proposed a set of clarifying questions on ambiguous/bonus-scope points (bonus time budget & priority order, test-DB strategy, LLM provider for the bonus, Design Tools bonus approach), and drafted the initial [AGENTS.md](AGENTS.md), this AI-WORKLOG.md, and the README.md skeleton based on the answers.
@@ -70,7 +87,7 @@ Notable AI-code decisions (the 2–3 examples required by the task) are marked w
 - **AI contribution:** Claude Code used a Figma MCP server the user connected to this session to create a new Figma file and draw every screen directly onto the user's account via the Plugin API (`use_figma`), writing the JavaScript for each layout itself (colors, spacing, typography, component structure) rather than using a design-generation black box. Produced: Admin Login (desktop + mobile, default + invalid-credentials error state), Admin Product List (desktop + mobile, default state, using the real seeded product names/statuses), and Admin Product Editor (desktop + mobile, default state, using the real "Wireless Mouse M1" seed data including its actual characteristics/description/SEO fields). Iterated through several Figma Plugin API errors (auto-layout `FILL` sizing set before a node was parented; CSS-selector queries breaking on node names containing spaces or em dashes) — all self-diagnosed and fixed via the tool's own error messages, verified with `node.screenshot()` after each build.
 - **My contribution:** Chose to draw directly in Figma via this session instead of the separately-billed Claude.ai "Design" canvas feature, once Figma MCP access was available (see PROMPTS-HISTORY.txt, prompts 17–18) — a cost/workflow call, not a code correctness one. Deliberately scoped the pilot down to one screen with no extra states first ("I want to see some result in few minutes max") to validate quality before committing quota to the rest. Requested and got the desktop Product List rows narrowed and centered (640px, not full-bleed) after judging the first pass too wide. Chose Admin Login as the pilot screen and reasoned through screen priority order.
 - **Verification:** Visual review of every `node.screenshot()` output before proceeding to the next screen/state. No code was written yet at this stage — verification was purely "does this look like a usable, on-brand mockup," which is why Phase 4 (below) re-verifies everything against the real running app.
-- **Reference:** [Figma file](https://www.figma.com/design/XEWl5YinPePK2aQajd9xE3) (7 artboards); PROMPTS-HISTORY.txt prompts 17–27.
+- **Reference:** [Figma file](https://www.figma.com/design/XEWl5YinPePK2aQajd9xE3/Product-Content-Studio-%E2%80%94-UI-Design?node-id=0-1&t=u1ntu3s3m0f4qGVE-1) (7 artboards); PROMPTS-HISTORY.txt prompts 17–27.
 
 **⭐ Notable decision 5 — Hit an external rate limit mid-task and changed plan rather than wait.** The Figma team's Starter-tier MCP tool-call limit was hit while building the mobile Admin Product Editor (the 7th/8th artboard), unrelated to Claude/Anthropic usage. Rather than wait for the reset or pay to upgrade, Claude Code pointed out that it already had the complete design spec in its own context (it wrote every color/spacing/text value itself) and could skip Figma's Dev Mode/`get_design_context` export path entirely, going straight to hand-written shadcn/ui components from the same spec. This turned out faster and more reliable than a design-to-code extraction would have been, since there was zero ambiguity about what each mockup contained.
 
@@ -124,7 +141,7 @@ Notable AI-code decisions (the 2–3 examples required by the task) are marked w
 - **Verification:** `npx tsc --noEmit`/`npm run lint`/`npm run build` clean (both routes correctly reported as dynamic `ƒ`, not prerendered). Manually verified in a live `next dev` session against the real seeded DB: catalog lists only the 2 published products (`wireless-mouse`, `usb-c-hub`), the draft `mechanical-keyboard` is absent from the list and 404s via the custom not-found page when visited directly by slug; product page renders characteristics/description correctly; confirmed via `document.querySelector('meta[name="description"]')` that the rendered meta description matches the product's `seoDescription`; checked both pages at mobile viewport width.
 - **Reference:** [src/app/page.tsx](src/app/page.tsx), [src/app/products/[slug]/page.tsx](src/app/products/[slug]/page.tsx), [src/components/public/site-header.tsx](src/components/public/site-header.tsx)
 
-### 2026-09-16 — Fix: `/admin/login` reachable while already authenticated
+### 2026-09-17 — Fix: `/admin/login` reachable while already authenticated
 
 - **Task:** The user found that visiting `/admin/login` with a valid session still showed the login form instead of redirecting to the product list.
 - **AI contribution:** The proxy's route matcher excluded `/admin/login` entirely (`/admin/((?!login).*)`), so it never ran the auth check for that route in either direction. Changed the matcher to cover `/admin/:path*` and added branching in `proxy()`: on `/admin/login`, an authenticated request is redirected to `/admin/products` and an unauthenticated one passes through; every other `/admin/*` route keeps the existing behavior (redirect to login when unauthenticated).
@@ -198,5 +215,37 @@ Notable AI-code decisions (the 2–3 examples required by the task) are marked w
 - **My contribution:** Caught that the original guard was scoped too broadly by testing `npm run dev` themselves and noticing it worked despite the "unsupported" Node version.
 - **Verification:** Confirmed on Node 20.14.0: `npm run seed` still fails fast with the clear guard message; `npm run dev` starts normally and serves the app (`✓ Ready`, `GET /` reachable) with no guard interference. Switched back to Node 22.21.1 and confirmed `npm run seed` still works normally there too.
 - **Reference:** [package.json](package.json), [scripts/check-node-version.cjs](scripts/check-node-version.cjs)
+
+### 2026-09-17 — Phase 6: docs pass
+
+- **Task:** Finalize README.md (setup/run/test instructions, test admin credentials, architecture notes, known limitations, actual time spent) and bring AI-WORKLOG.md up to date, per DEVELOPMENT-PLAN.md's Phase 6.
+- **AI contribution:** Filled in README's "Time spent" TODO with an estimate derived from `git log --all` commit timestamps (~9.5h, slightly over the 6–8h core budget, mainly attributable to Phase 5's scope growing mid-project). Fixed a stale claim in the Prerequisites section (said `dev`/`build`/`start`/`seed`/`test` all check the Node version, which was true right after that guard was first added but became inaccurate once it was rescoped to `seed` only). Updated the top status banner to reflect Phases 1–6 complete. Removed a leftover "(fill in others as used...)" placeholder row from the AI-WORKLOG tools table (no other AI tools were actually used) and added a dedicated "Role of automated tests in verifying AI-generated code" section summarizing how tests were verified against real infrastructure, the two real bugs the test suites themselves caught, and how the AI-written test assertions were quality-checked (asserting persisted state, not just response shape).
+- **My contribution:** Directed the phase transition; no scope changes.
+- **Verification:** Read through README.md and AI-WORKLOG.md end to end for staleness (`grep -rn TODO` across all doc files came back empty afterward) rather than only appending new content.
+- **Reference:** [README.md](README.md), [AI-WORKLOG.md](AI-WORKLOG.md)
+
+### 2026-09-17 — Correction: "Time spent" replaced with real Clockify tracking
+
+- **Task:** The previous entry's "Time spent" figure (~9.5h, derived from `git log --all` commit timestamps) overcounted real working time, since it measured wall-clock span between the first and last commit rather than actual time spent — it doesn't know about breaks. The user tracked time attentively in Clockify throughout and provided the exported PDF summary report to replace it with real numbers.
+- **AI contribution:** Read the Clockify PDF (`Clockify_Time_Report_Summary_14_09_2026-20_09_2026.pdf`, total 08:41:47 through Phase 5) and replaced README's "Time spent" table with the real per-entry durations, mapped to phases. Where a single Clockify entry names multiple activities (e.g. "Execute Phase 4 (UI implementation) + Fix missing-slug + Connect token refresh endpoint + Add Axios + Planning Phase 5 + Execute Phase 5 (Audo tests)", 1h39m45s), its duration was split evenly across the number of named activities rather than guessed at — the export doesn't sub-divide a single tracked entry any further, so an even split is the only defensible allocation without more granular source data. Verified the resulting per-phase numbers sum back to the report's own total (08:41:47) before writing them into README.
+- **My contribution:** Caught the estimation error and supplied the ground-truth source (the Clockify report) instead of just asking for a bigger guess.
+- **Verification:** Summed all extracted per-phase durations in seconds and confirmed the total matches the PDF's reported "Total: 08:41:47" exactly.
+- **Reference:** [README.md](README.md) (Time spent section)
+
+### 2026-09-17 — Correction: fixed two wrong dates in this log's own entry headers
+
+- **Task:** The user noticed the Sep 16/Sep 17 date headers in this file looked mixed up and asked for a review, then supplied their own memory of the timeline (planning started 09-14/09-15 and finished 09-16; Phase 1 and Phase 2 also finished 09-16; everything else is 09-17) to verify against the Clockify report.
+- **AI contribution:** Cross-checked every entry header two ways: against the corresponding commit's actual git timestamp, and against the Clockify PDF's per-day totals (Sep14: 00:25:55, Sep15: 00:38:45, Sep16: 03:38:46, Sep17: 03:58:21). The user's memory reconciled exactly: Sep14+Sep15 (01:04:40) matches the "Planning" entries' portion that predates any commit; Sep16 (03:38:46) matches the remaining planning time plus all of Phase 1 and Phase 2's logged durations to the second; Sep17 (03:58:21) matches the sum of every remaining entry. Found two mismatches: the "Planning: stack, architecture, and development order" entry was dated as a single day (2026-09-16) when it actually spans 2026-09-14 to 2026-09-16, and the "`/admin/login` reachable while already authenticated" fix was dated 2026-09-16 when its commit landed at 02:51 on 2026-09-17. Fixed both headers; found no other mismatches.
+- **My contribution:** Flagged the date inconsistency, held off approving any commit until asked to verify against a second independent source (git timestamps had already been checked in the prior turn), then supplied the specific day-by-day breakdown from memory for cross-verification.
+- **Verification:** Summed the relevant Clockify entry durations against each day's reported total and confirmed exact matches (to the second) for all three days before editing anything.
+- **Reference:** [AI-WORKLOG.md](AI-WORKLOG.md)
+
+### 2026-09-17 — Correction: Phase 3 (design) time moved from core to bonus budget
+
+- **Task:** After a full requirements-compliance review, the user pointed out that the "Time spent" section's core total (8h41m47s) wrongly included Phase 3 (Figma design, ~1h00m43s) — Design Tools is explicitly a bonus item in PROJECT-REQUIREMENTS.md, and AGENTS.md's own time-budget policy says bonus work isn't counted against the 6–8h core budget.
+- **AI contribution:** Split README's "Time spent" section into a "Core budget" table (Planning + Phases 1/2/4/5, excluding design) totaling **7h41m04s** — which now fits inside the stated 6–8h core budget — and a separate "Bonus budget" table showing Phase 3's 1h00m43s against the ~2–3h bonus allotment. Cross-referenced the same figure into the Bonus features table's Design Tools row.
+- **My contribution:** Caught the miscategorization during a full requirements-compliance review requested separately.
+- **Verification:** Re-summed the core-only phases (2:58:50 + 0:53:43 + 0:33:55 + 1:17:54 + 1:56:42 = 7:41:04) and confirmed it plus Phase 3's 1:00:43 reproduces the original Clockify-verified total of 8:41:47.
+- **Reference:** [README.md](README.md) (Time spent section)
 
 <!-- Further entries appended below as implementation proceeds. -->
