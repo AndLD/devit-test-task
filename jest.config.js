@@ -1,5 +1,7 @@
-import type { Config } from "jest";
-
+// Plain JS, not TS: Jest's own config loader needs `ts-node` to parse a
+// `.ts` config file, which isn't otherwise a dependency of this project —
+// keeping this file JS avoids adding it just for that.
+//
 // The Next.js/Prisma stack this project runs on is ESM-first: Prisma 7's
 // generated client uses `import.meta.url` to locate its wasm query
 // compiler, and `jose` (used for JWT signing) ships ESM-only. Both are
@@ -14,7 +16,8 @@ const esmTransform = {
   "^.+\\.tsx?$": ["ts-jest", { useESM: true }],
 };
 
-const config: Config = {
+/** @type {import('jest').Config} */
+module.exports = {
   projects: [
     {
       displayName: "unit",
@@ -40,5 +43,3 @@ const config: Config = {
     },
   ],
 };
-
-export default config;

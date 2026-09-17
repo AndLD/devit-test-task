@@ -145,4 +145,12 @@ Notable AI-code decisions (the 2–3 examples required by the task) are marked w
 - **Verification:** `npx tsc --noEmit`/`npm run lint`/`npm run build` all clean. `npm run test:unit` — 39 tests passing, no DB/Docker involved. `npm run test:integration` — 16 tests passing against a real disposable Postgres container (migrations applied fresh each run, verified in the test output). One integration assertion (`toBeInstanceOf(Array)` on a JSON response body) initially failed due to a cross-realm `Array` constructor mismatch between the test file and Next's `Response`/JSON implementation — fixed by asserting `Array.isArray(...)` instead. After the `requireAdminId` refactor, re-verified the real admin flow live in `next dev` (not just the new tests): logged in, listed products, opened the editor, and saved a change — confirmed `PATCH /api/admin/products/[id] → 200` via `read_network_requests`, so the refactor didn't regress the actual running app.
 - **Reference:** [jest.config.ts](jest.config.ts), [tests/unit/](tests/unit/), [tests/integration/](tests/integration/), [src/server/auth/guard.ts](src/server/auth/guard.ts)
 
+### 2026-09-17 — Fix: `npm test` failing on a clean checkout (missing `ts-node`)
+
+- **Task:** The user ran `npm test` on their machine right after Phase 5 and got `Error: 'ts-node' is required for the TypeScript configuration files`. Jest's own config loader needs `ts-node` to parse a `.ts` config file, and this session's shell happened to already have it available globally/cached, so the gap wasn't caught before committing `jest.config.ts`.
+- **AI contribution:** Converted `jest.config.ts` to plain `jest.config.js` (CommonJS, `module.exports`), same content minus TS types — avoids adding `ts-node` as a dependency just to load the config.
+- **My contribution:** Reported the exact failing command and stack trace from a real, unmodified checkout.
+- **Verification:** Confirmed `node_modules/ts-node` doesn't exist in this project (matching the user's failure). Re-ran `npm run test:unit` (39 passing) and `npm run test:integration` (16 passing, real testcontainers Postgres) with the new JS config and no `ts-node` installed. `npx tsc --noEmit`/`npm run lint` clean.
+- **Reference:** [jest.config.js](jest.config.js) (replaces the deleted `jest.config.ts`)
+
 <!-- Further entries appended below as implementation proceeds. -->

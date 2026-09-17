@@ -81,7 +81,7 @@ npm run test:integration  # spins up a real ephemeral Postgres via testcontainer
 
 Both suites are fully reproducible and need no external services or API keys — `test:integration` only needs a local Docker daemon, the same one used for `docker compose up`. No `.env` is required for tests: they use fixed test-only JWT secrets and a Postgres container testcontainers starts and tears down itself.
 
-Jest runs under Node's native ESM support (`--experimental-vm-modules`, wired into both npm scripts) rather than the more common CommonJS + ts-jest setup — see the note at the top of [jest.config.ts](jest.config.ts): Prisma 7's generated client uses `import.meta.url` and `jose` ships ESM-only, both unusable under Jest's default CJS transform.
+Jest runs under Node's native ESM support (`--experimental-vm-modules`, wired into both npm scripts) rather than the more common CommonJS + ts-jest setup — see the note at the top of [jest.config.js](jest.config.js): Prisma 7's generated client uses `import.meta.url` and `jose` ships ESM-only, both unusable under Jest's default CJS transform.
 
 ## Testing strategy & rationale
 

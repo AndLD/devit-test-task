@@ -176,3 +176,26 @@ Execute Phase 5
 
 Prompt No 46
 Sync PROMPTS-HISTORY.txt
+
+Prompt No 47
+What I do wrong?
+
+```andrey@Andriis-Laptop devit-test-task % npm test
+
+> product-content-studio@0.1.0 test
+> npm run test:unit && npm run test:integration
+
+
+> product-content-studio@0.1.0 test:unit
+> node --experimental-vm-modules node_modules/.bin/jest --selectProjects unit
+
+Error: Jest: Failed to parse the TypeScript config file /Users/andrey/Documents/TestTaskProjects/devit-test-task/jest.config.ts
+  Error: Jest: 'ts-node' is required for the TypeScript configuration files. Make sure it is installed
+Error: Cannot find package 'ts-node' imported from /Users/andrey/Documents/TestTaskProjects/devit-test-task/node_modules/jest-config/build/index.js
+    at readConfigFileAndSetRootDir (/Users/andrey/Documents/TestTaskProjects/devit-test-task/node_modules/jest-config/build/index.js:2373:13)
+    at async readInitialOptions (/Users/andrey/Documents/TestTaskProjects/devit-test-task/node_modules/jest-config/build/index.js:1190:13)
+    at async readConfig (/Users/andrey/Documents/TestTaskProjects/devit-test-task/node_modules/jest-config/build/index.js:957:7)
+    at async readConfigs (/Users/andrey/Documents/TestTaskProjects/devit-test-task/node_modules/jest-config/build/index.js:1211:26)
+    at async runCLI (/Users/andrey/Documents/TestTaskProjects/devit-test-task/node_modules/@jest/core/build/index.js:1420:7)
+    at async Object.run (/Users/andrey/Documents/TestTaskProjects/devit-test-task/node_modules/jest-cli/build/index.js:665:9)
+andrey@Andriis-Laptop devit-test-task % ```
