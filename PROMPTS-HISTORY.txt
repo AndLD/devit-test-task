@@ -305,3 +305,35 @@ Verify my time memories against the the PDF report
 
 Prompt No 64
 Yes
+
+Prompt No 65
+Now  evaluate the whole project (core functionality) implemented against project requirements file.
+
+Prompt No 66
+But wait, we should highlight that 8h 42h includes time for the partial Design generation which is marked as bonus task in requriements actually
+
+Prompt No 67
+Do we have AI auto tests evaluation on our md files as it is requested in the project requirements?
+
+Prompt No 68
+where "Quality assessment of the AI-written tests themselves" located? If it is placed only in entries, we need it to be more noticable
+
+Prompt No 69
+Project requirements includes this: "2–3 конкретні приклади рішень щодо AI-коду з поясненням вибору й результатів перевірки; підтвердження — короткі фрагменти роботи або посилання на відповідні зміни в репозиторії."
+
+Do not you think our AI-WORKLOG is too long/broad?
+
+Do not change AI-WORKLOG, let's just discuss
+
+Prompt No 70
+how do you think, maybe we need make two files: one is full and one with key highlights? Do not implement, just discuss
+
+Prompt No 71
+I just know that even technician reviewer will not review such a long file
+
+Prompt No 72
+Make additional file AI-WORKLOG-SUMMARY.md.
+Do not commit, wait for approve
+
+Prompt No 73
+Sync PROMPTS-HISTORY.txt
