@@ -30,6 +30,11 @@ jobs:
           cache: "npm"
       - run: npm ci
       - run: npx prisma generate
+      # tsc needs Next's generated ambient types (LayoutProps/PageProps
+      # helpers, etc.) in .next/types, which only exist after `next dev` or
+      # `next build` has run at least once — `next typegen` generates just
+      # those without a full build, for a fresh checkout with no .next yet.
+      - run: npx next typegen
       - run: npx tsc --noEmit
       - run: npx tsc --noEmit -p cypress/tsconfig.json
       - run: npm run lint
