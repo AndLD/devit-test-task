@@ -88,6 +88,30 @@ export class ProductRepository {
     });
     return toDomainProduct(record);
   }
+
+  // Only used by the Shopify import bonus to check slug availability — the
+  // core admin editor never creates/deletes products (out of scope per
+  // PROJECT-REQUIREMENTS.md), so this and create() below exist solely for
+  // that bonus's explicit exception to that rule.
+  async findBySlug(slug: string): Promise<Product | null> {
+    const record = await this.db.product.findUnique({ where: { slug } });
+    return record ? toDomainProduct(record) : null;
+  }
+
+  async create(data: {
+    slug: string;
+    name: string;
+    characteristics: Product["characteristics"];
+    description: string;
+    seoTitle: string;
+    seoDescription: string;
+    status: ProductStatus;
+  }): Promise<Product> {
+    const record = await this.db.product.create({
+      data: { ...data, characteristics: data.characteristics as never },
+    });
+    return toDomainProduct(record);
+  }
 }
 
 export const productRepository = new ProductRepository();
