@@ -216,4 +216,12 @@ All code in this repository — application and tests alike — was written by C
 - **Verification:** Read through README.md and AI-WORKLOG.md end to end for staleness (`grep -rn TODO` across all doc files came back empty afterward) rather than only appending new content.
 - **Reference:** [README.md](README.md), [AI-WORKLOG.md](AI-WORKLOG.md)
 
+### 2026-09-17 — Correction: "Time spent" replaced with real Clockify tracking
+
+- **Task:** The previous entry's "Time spent" figure (~9.5h, derived from `git log --all` commit timestamps) overcounted real working time, since it measured wall-clock span between the first and last commit rather than actual time spent — it doesn't know about breaks. The user tracked time attentively in Clockify throughout and provided the exported PDF summary report to replace it with real numbers.
+- **AI contribution:** Read the Clockify PDF (`Clockify_Time_Report_Summary_14_09_2026-20_09_2026.pdf`, total 08:41:47 through Phase 5) and replaced README's "Time spent" table with the real per-entry durations, mapped to phases. Where a single Clockify entry names multiple activities (e.g. "Execute Phase 4 (UI implementation) + Fix missing-slug + Connect token refresh endpoint + Add Axios + Planning Phase 5 + Execute Phase 5 (Audo tests)", 1h39m45s), its duration was split evenly across the number of named activities rather than guessed at — the export doesn't sub-divide a single tracked entry any further, so an even split is the only defensible allocation without more granular source data. Verified the resulting per-phase numbers sum back to the report's own total (08:41:47) before writing them into README.
+- **My contribution:** Caught the estimation error and supplied the ground-truth source (the Clockify report) instead of just asking for a bigger guess.
+- **Verification:** Summed all extracted per-phase durations in seconds and confirmed the total matches the PDF's reported "Total: 08:41:47" exactly.
+- **Reference:** [README.md](README.md) (Time spent section)
+
 <!-- Further entries appended below as implementation proceeds. -->

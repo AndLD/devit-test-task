@@ -151,17 +151,19 @@ Full principles in [AGENTS.md](AGENTS.md).
 
 ## Time spent
 
-Derived from commit timestamps (`git log --all`) across one continuous session from 2026-09-16 20:04 to 2026-09-17 05:41 — **~9.5 hours total**, all on core functionality (no bonus work started yet, see below). This is wall-clock span across an AI pair-programming session (Claude Code), not a separately tracked stopwatch, so treat it as approximate:
+Tracked attentively in Clockify (not estimated from commit timestamps — an earlier draft of this section did that and undercounted real elapsed time, since it couldn't see breaks between work sessions). **Total through Phase 5: 8h41m47s**, all on core functionality (no bonus work started yet). Per-phase durations below are exact where a logged time entry maps to a single phase; where one entry spans multiple activities (e.g. "Execute Phase 4 + Fix missing-slug + ... + Execute Phase 5"), its duration is split evenly across the number of distinct activities named, since Clockify's summary export doesn't sub-divide a single entry further:
 
-| Slice                                                                   | Approx. time |
-| ------------------------------------------------------------------------ | ------------ |
-| Planning (AGENTS.md/DEVELOPMENT-PLAN.md/AI-WORKLOG.md, Git Flow policy) + Phase 1 scaffolding | ~2h45m       |
-| Phase 2 — backend core (JWT auth, product APIs, seed)                    | ~1h          |
-| Phase 3 — design (Figma via MCP) + Phase 4 — UI implementation (admin + public) and the bugs found/fixed along the way | ~3h          |
-| Phase 5 — automated tests (backend unit/integration, frontend, Cypress e2e) + Node-version tooling fixes | ~1h45m       |
-| Phase 6 — this docs pass                                                 | ~1h          |
+| Phase                                                    | Time         |
+| --------------------------------------------------------- | ------------ |
+| Planning & AI harness setup (AGENTS.md/DEVELOPMENT-PLAN.md/AI-WORKLOG.md, Git Flow policy, harness corrections) | 2h58m50s     |
+| Phase 1 — scaffolding                                      | 53m43s       |
+| Phase 2 — backend core (JWT auth, product APIs, seed)       | 33m55s       |
+| Phase 3 — design (Figma via MCP)                            | 1h00m43s     |
+| Phase 4 — UI implementation (admin + public) + the missing-slug fix, token-refresh wiring, and axios migration done along the way | 1h17m54s     |
+| Phase 5 — automated tests (backend + frontend + Cypress e2e) and the Node-version/ESM tooling fixes | 1h56m42s     |
+| **Total (through Phase 5)**                                 | **8h41m47s** |
 
-This runs a bit past the 6–8h core budget in AGENTS.md, mainly because Phase 5's scope grew mid-project — frontend component tests and the Cypress e2e suite weren't in the original plan and were added after the fact (see AI-WORKLOG.md) once the backend-only test suite was flagged as incomplete.
+This is already at the top of the 6–8h core budget in AGENTS.md, and Phase 6 (this docs pass) isn't included above — it wasn't logged in Clockify separately in time to make this report, so actual core time is somewhat higher once it's added. Contributing factors: Phase 5's scope grew mid-project (frontend component tests and the Cypress e2e suite weren't in the original plan, added once the backend-only suite was flagged as incomplete), and several rounds of manual verification and bug-hunting (font fix, transparent-refresh wiring, the `/admin/login` redirect bug, the `notFound()` status-code bug, Node-version tooling) that a smaller, unverified implementation wouldn't have needed.
 
 ## Bonus features
 
