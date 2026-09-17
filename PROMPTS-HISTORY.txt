@@ -158,3 +158,18 @@ Lets continue Phase 4: we already implemented Admin side. Now we need to impleme
 
 Prompt No 40
 I found that login page is still available even when admin already authorized. It is not correct
+
+Prompt No 41
+Did we complete all required functionality for Public side?
+
+Prompt No 42
+Merge the PR
+
+Prompt No 43
+I adjusted PROMPTS-HISTORY.txt. Verify and commit
+
+Prompt No 44
+Merge PR
+
+Prompt No 45
+Execute Phase 5

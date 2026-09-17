@@ -7,10 +7,10 @@ import {
 } from "@/server/services/product-service";
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const adminId = await requireAdminId();
+  const adminId = await requireAdminId(request);
   if (!adminId) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
@@ -31,7 +31,7 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const adminId = await requireAdminId();
+  const adminId = await requireAdminId(request);
   if (!adminId) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
