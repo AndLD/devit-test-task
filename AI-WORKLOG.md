@@ -41,7 +41,7 @@ All code in this repository — application and tests alike — was written by C
 
 ## Entries
 
-### 2026-09-16 — Planning: stack, architecture, and development order
+### 2026-09-14 to 2026-09-16 — Planning: stack, architecture, and development order
 
 - **Task:** Kick off the project by reading PROJECT-REQUIREMENTS.md, choosing technologies from the options offered, and defining strategic decisions (architecture principles, test strategy, bonus scope/order) before any code is written.
 - **AI contribution:** Claude Code read the requirements, proposed a set of clarifying questions on ambiguous/bonus-scope points (bonus time budget & priority order, test-DB strategy, LLM provider for the bonus, Design Tools bonus approach), and drafted the initial [AGENTS.md](AGENTS.md), this AI-WORKLOG.md, and the README.md skeleton based on the answers.
@@ -133,7 +133,7 @@ All code in this repository — application and tests alike — was written by C
 - **Verification:** `npx tsc --noEmit`/`npm run lint`/`npm run build` clean (both routes correctly reported as dynamic `ƒ`, not prerendered). Manually verified in a live `next dev` session against the real seeded DB: catalog lists only the 2 published products (`wireless-mouse`, `usb-c-hub`), the draft `mechanical-keyboard` is absent from the list and 404s via the custom not-found page when visited directly by slug; product page renders characteristics/description correctly; confirmed via `document.querySelector('meta[name="description"]')` that the rendered meta description matches the product's `seoDescription`; checked both pages at mobile viewport width.
 - **Reference:** [src/app/page.tsx](src/app/page.tsx), [src/app/products/[slug]/page.tsx](src/app/products/[slug]/page.tsx), [src/components/public/site-header.tsx](src/components/public/site-header.tsx)
 
-### 2026-09-16 — Fix: `/admin/login` reachable while already authenticated
+### 2026-09-17 — Fix: `/admin/login` reachable while already authenticated
 
 - **Task:** The user found that visiting `/admin/login` with a valid session still showed the login form instead of redirecting to the product list.
 - **AI contribution:** The proxy's route matcher excluded `/admin/login` entirely (`/admin/((?!login).*)`), so it never ran the auth check for that route in either direction. Changed the matcher to cover `/admin/:path*` and added branching in `proxy()`: on `/admin/login`, an authenticated request is redirected to `/admin/products` and an unauthenticated one passes through; every other `/admin/*` route keeps the existing behavior (redirect to login when unauthenticated).
@@ -223,5 +223,13 @@ All code in this repository — application and tests alike — was written by C
 - **My contribution:** Caught the estimation error and supplied the ground-truth source (the Clockify report) instead of just asking for a bigger guess.
 - **Verification:** Summed all extracted per-phase durations in seconds and confirmed the total matches the PDF's reported "Total: 08:41:47" exactly.
 - **Reference:** [README.md](README.md) (Time spent section)
+
+### 2026-09-17 — Correction: fixed two wrong dates in this log's own entry headers
+
+- **Task:** The user noticed the Sep 16/Sep 17 date headers in this file looked mixed up and asked for a review, then supplied their own memory of the timeline (planning started 09-14/09-15 and finished 09-16; Phase 1 and Phase 2 also finished 09-16; everything else is 09-17) to verify against the Clockify report.
+- **AI contribution:** Cross-checked every entry header two ways: against the corresponding commit's actual git timestamp, and against the Clockify PDF's per-day totals (Sep14: 00:25:55, Sep15: 00:38:45, Sep16: 03:38:46, Sep17: 03:58:21). The user's memory reconciled exactly: Sep14+Sep15 (01:04:40) matches the "Planning" entries' portion that predates any commit; Sep16 (03:38:46) matches the remaining planning time plus all of Phase 1 and Phase 2's logged durations to the second; Sep17 (03:58:21) matches the sum of every remaining entry. Found two mismatches: the "Planning: stack, architecture, and development order" entry was dated as a single day (2026-09-16) when it actually spans 2026-09-14 to 2026-09-16, and the "`/admin/login` reachable while already authenticated" fix was dated 2026-09-16 when its commit landed at 02:51 on 2026-09-17. Fixed both headers; found no other mismatches.
+- **My contribution:** Flagged the date inconsistency, held off approving any commit until asked to verify against a second independent source (git timestamps had already been checked in the prior turn), then supplied the specific day-by-day breakdown from memory for cross-verification.
+- **Verification:** Summed the relevant Clockify entry durations against each day's reported total and confirmed exact matches (to the second) for all three days before editing anything.
+- **Reference:** [AI-WORKLOG.md](AI-WORKLOG.md)
 
 <!-- Further entries appended below as implementation proceeds. -->
