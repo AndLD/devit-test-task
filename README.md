@@ -133,6 +133,16 @@ See `.env.example` for the full list (no real secrets committed). Expected varia
 - `OPENAI_API_KEY` — optional, only needed to exercise the real (non-mocked) LLM bonus feature
 - `SHOPIFY_STORE_DOMAIN` / `SHOPIFY_ADMIN_API_TOKEN` — optional, only needed for the Shopify import bonus feature
 
+## AI content suggestions (bonus)
+
+A "Suggest with AI" button on the product editor (`ProductEditorForm`) generates a description, SEO title, and SEO description in Ukrainian from the product's **name and characteristics** (never its current draft content — this is meant to help write it, not paraphrase). Clicking it shows a preview with **Apply to editor** and **Discard**; applying only fills the editor's fields in the browser — it never saves or publishes by itself, and never touches unsaved edits already in the other fields. A failed or rejected generation leaves every field exactly as it was.
+
+**How to test it (no API key needed):** leave `OPENAI_API_KEY` unset (the default — see `.env.example`) and click "Suggest with AI" on any product. This uses `MockLlmProvider` (`src/server/services/llm/mock-provider.ts`), a deterministic, offline generator — the preview is explicitly labeled **"Simulated (no API key set)"** so it's never mistaken for a real model's output. Covered by `tests/unit/mock-llm-provider.test.ts`, `tests/integration/admin-suggest.test.ts`, `tests/frontend-integration/product-editor-form-suggest-flow.test.tsx`, and a Cypress e2e test in `cypress/e2e/admin.cy.ts`.
+
+**Real mode:** set `OPENAI_API_KEY` in `.env` to switch to `OpenAiProvider` (`src/server/services/llm/openai-provider.ts`), which calls the OpenAI Chat Completions API (`gpt-4o-mini` by default, override with `OPENAI_MODEL`) with a system prompt constraining the output to the same limits as the editor (description ≤1000, SEO title ≤60, SEO description ≤160, all non-empty), requested as JSON. Either way, the response is re-validated server-side against those same limits before ever reaching the client (`SuggestionService.generate`, `src/server/services/llm/suggestion-service.ts`) — a too-long field is trimmed to fit, but an empty one is rejected outright rather than shown as a usable suggestion, since no amount of truncation fixes that. A network failure, a non-2xx response, or an unparsable/incomplete response from OpenAI surfaces as a plain error message in the editor — the request never touches the database, so there's nothing to lose.
+
+**Known limitation:** real mode is implemented against OpenAI's documented Chat Completions API contract and covered by the same server-side validation as mock mode, but wasn't exercised against the live API in this development session — no `OPENAI_API_KEY` was available in this environment. If you have one, set it in `.env` and try "Suggest with AI" to verify the real path yourself; the request/response shape is otherwise identical to mock mode from the client's point of view.
+
 ## Architecture notes
 
 Current folder structure:
@@ -146,6 +156,7 @@ Current folder structure:
 - `src/server/auth/` — `passwords.ts` (bcrypt hashing), `tokens.ts` (sign/verify access+refresh JWTs via `jose`, refresh-token hashing), `cookies.ts` (cookie read/write helpers), `guard.ts` (`requireAdminId(request)` used by admin Route Handlers).
 - `src/server/repositories/` — thin Prisma wrappers (`AdminUserRepository`, `RefreshTokenRepository`, `ProductRepository`), the only layer that imports the generated Prisma client.
 - `src/server/services/` — framework-free business logic (`AuthService`, `ProductService`) built on repository interfaces, so they're unit-testable with fake repositories (no DB, no Next.js) per the testability principle in [AGENTS.md](AGENTS.md).
+- `src/server/services/llm/` — the LLM bonus's provider abstraction: `types.ts` (the `LlmProvider` interface), `mock-provider.ts` / `openai-provider.ts` (the two implementations), `suggestion-service.ts` (picks one based on `OPENAI_API_KEY` and validates the result) — see "AI content suggestions" above.
 - `src/lib/validation/` — Zod schemas (`product.ts`, `auth.ts`) shared by client forms (Phase 4) and server Route Handlers, so invalid data is rejected identically everywhere, including direct API calls.
 - `src/lib/types/` — domain types decoupled from Prisma's generated types.
 - `prisma/schema.prisma` — `AdminUser`, `RefreshToken` (access+refresh JWT pattern), and `Product` models.
@@ -161,7 +172,8 @@ Full principles in [AGENTS.md](AGENTS.md).
 ## Known limitations / incomplete parts
 
 - Design Tools bonus: the public catalog/product pages were implemented directly in code (matching the admin UI's visual language) rather than being designed in Figma first, unlike the admin screens.
-- No LLM integration, Shopify import, or CI pipeline yet — see Bonus features below.
+- LLM integration bonus: real mode (OpenAI) is implemented but wasn't exercised against the live API in this session — no API key was available. Mock mode is fully implemented and tested. See "AI content suggestions" above.
+- No Shopify import yet — see Bonus features below.
 
 ## Time spent
 
@@ -186,13 +198,13 @@ This fits inside the 6–8h core budget in AGENTS.md, though Phase 6 (this docs 
 | ------------------------------- | -------- |
 | Design Tools (Phase 3 — Figma via MCP) | 1h00m43s |
 
-Phase 3 (design) was originally miscounted into the core total in an earlier draft of this section — Design Tools is a bonus item per PROJECT-REQUIREMENTS.md, not part of the core admin/public/tests scope, so its time belongs in the bonus budget instead. See Bonus features below for status of the other bonus tasks (none started).
+Phase 3 (design) was originally miscounted into the core total in an earlier draft of this section — Design Tools is a bonus item per PROJECT-REQUIREMENTS.md, not part of the core admin/public/tests scope, so its time belongs in the bonus budget instead. The Infrastructure and LLM integration bonus items (both now done, see Bonus features below) were completed after this Clockify report's date range and aren't reflected in the table above yet.
 
 ## Bonus features
 
 | Bonus                                | Status      | Notes                                                                                                                                                                                                                                                                                        |
 | ------------------------------------ | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| LLM integration (OpenAI)             | Not started | Mock mode will be the default for reviewers (no API key required); real-mode verification notes will go here.                                                                                                                                                                                |
+| LLM integration (OpenAI)             | Done (mock mode fully verified; real mode implemented but not exercised live — no API key in this environment) | "Suggest with AI" button on the product editor generates description/SEO fields in Ukrainian from the product's name and characteristics. See "AI content suggestions" below. |
 | Shopify import                       | Not started |                                                                                                                                                                                                                                                                                              |
 | Design Tools (Figma → code)          | In progress (~1h of the ~2–3h bonus budget) | [Figma file](https://www.figma.com/design/XEWl5YinPePK2aQajd9xE3/Product-Content-Studio-%E2%80%94-UI-Design?node-id=0-1&t=u1ntu3s3m0f4qGVE-1) — Admin Login, Product List, Product Editor (desktop+mobile) designed and transferred to shadcn/ui components; see [AI-WORKLOG.md](AI-WORKLOG.md) for the transfer notes. Public catalog/product pages were built directly in code (reusing the same design language) rather than designed in Figma first. |
 | Infrastructure (Docker Compose / CI) | Done | `docker compose up` now runs the whole app (Postgres + a one-off `migrate` job + the Next.js app itself), not just the database — see "Running the whole app via Docker Compose" below. GitHub Actions CI ([.github/workflows/ci.yml](.github/workflows/ci.yml)) runs on every push/PR: lint, both `tsc --noEmit` targets, build, all four Jest suites (backend unit/integration via testcontainers, frontend unit/integration), and the Cypress e2e suite against a Postgres service container. |

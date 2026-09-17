@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
@@ -10,6 +11,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { authenticatedRequest } from "@/lib/authenticated-request";
 import { cn } from "@/lib/utils";
 import type { Product, ProductStatus } from "@/lib/types/product";
+
+interface ContentSuggestion {
+  description: string;
+  seoTitle: string;
+  seoDescription: string;
+}
 
 const LIMITS = {
   description: 1000,
@@ -45,6 +52,16 @@ export function ProductEditorForm({ product }: { product: Product }) {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [justSaved, setJustSaved] = useState(false);
+
+  // Independent of the save flow above (its own pending/error state) so a
+  // suggestion failure can never be confused with — or clobber — a save
+  // result, and vice versa. `suggestion` only ever populates a preview;
+  // nothing here touches description/seoTitle/seoDescription until the user
+  // explicitly applies it, and applying still requires a separate Save.
+  const [suggestPending, setSuggestPending] = useState(false);
+  const [suggestError, setSuggestError] = useState<string | null>(null);
+  const [suggestion, setSuggestion] = useState<ContentSuggestion | null>(null);
+  const [suggestionMocked, setSuggestionMocked] = useState(false);
 
   const isValid = useMemo(
     () =>
@@ -90,6 +107,48 @@ export function ProductEditorForm({ product }: { product: Product }) {
     }
   }
 
+  async function handleSuggest() {
+    setSuggestPending(true);
+    setSuggestError(null);
+    try {
+      const res = await authenticatedRequest<{
+        suggestion?: ContentSuggestion;
+        mocked?: boolean;
+        error?: string;
+      }>({
+        url: `/api/admin/products/${product.id}/suggest`,
+        method: "POST",
+      });
+      if (res.status === 401) {
+        router.push("/admin/login");
+        return;
+      }
+      if (res.status < 200 || res.status >= 300 || !res.data.suggestion) {
+        setSuggestError(res.data?.error ?? "Could not generate a suggestion.");
+        return;
+      }
+      setSuggestion(res.data.suggestion);
+      setSuggestionMocked(Boolean(res.data.mocked));
+    } catch {
+      setSuggestError("Network error — please try again.");
+    } finally {
+      setSuggestPending(false);
+    }
+  }
+
+  function applySuggestion() {
+    if (!suggestion) return;
+    setDescription(suggestion.description);
+    setSeoTitle(suggestion.seoTitle);
+    setSeoDescription(suggestion.seoDescription);
+    setJustSaved(false);
+    setSuggestion(null);
+  }
+
+  function discardSuggestion() {
+    setSuggestion(null);
+  }
+
   return (
     <div className="space-y-5 rounded-xl border bg-card p-6">
       {error && (
@@ -97,6 +156,69 @@ export function ProductEditorForm({ product }: { product: Product }) {
           {error}
         </div>
       )}
+
+      <div className="space-y-3 rounded-lg border border-dashed p-4">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <p className="text-sm font-medium">AI-generated suggestion</p>
+            <p className="text-xs text-muted-foreground">
+              Generates description &amp; SEO fields from the product&apos;s
+              name and characteristics. Only fills the fields below when you
+              apply it — nothing is saved automatically.
+            </p>
+          </div>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={handleSuggest}
+            disabled={suggestPending}
+          >
+            {suggestPending && <Spinner />}
+            {suggestPending ? "Generating…" : "Suggest with AI"}
+          </Button>
+        </div>
+
+        {suggestError && (
+          <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-sm font-medium text-red-700">
+            {suggestError}
+          </div>
+        )}
+
+        {suggestion && (
+          <div className="space-y-3 rounded-lg border bg-muted/30 p-3">
+            <div className="flex items-center gap-2">
+              <p className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+                Preview
+              </p>
+              {suggestionMocked && (
+                <Badge variant="secondary">Simulated (no API key set)</Badge>
+              )}
+            </div>
+            <dl className="space-y-2 text-sm">
+              <div>
+                <dt className="font-medium">Description</dt>
+                <dd className="text-muted-foreground">{suggestion.description}</dd>
+              </div>
+              <div>
+                <dt className="font-medium">SEO title</dt>
+                <dd className="text-muted-foreground">{suggestion.seoTitle}</dd>
+              </div>
+              <div>
+                <dt className="font-medium">SEO description</dt>
+                <dd className="text-muted-foreground">{suggestion.seoDescription}</dd>
+              </div>
+            </dl>
+            <div className="flex gap-2">
+              <Button type="button" onClick={applySuggestion}>
+                Apply to editor
+              </Button>
+              <Button type="button" variant="secondary" onClick={discardSuggestion}>
+                Discard
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
 
       <div className="space-y-1.5">
         <Label htmlFor="description">Description</Label>

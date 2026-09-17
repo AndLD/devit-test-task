@@ -97,4 +97,27 @@ describe("Admin — product editor", () => {
     cy.reload();
     cy.get("#description").should("have.value", original);
   });
+
+  it("generates an AI suggestion and applies it to the editor without saving", () => {
+    const original = "A 7-in-1 USB-C hub that adds HDMI, USB-A, and card reader ports to a single USB-C port.";
+
+    cy.get("#description").should("have.value", original);
+    cy.contains("button", "Suggest with AI").click();
+
+    // The e2e run has no OPENAI_API_KEY configured (see .env.example), so
+    // this always exercises the mock provider — clearly marked as such.
+    cy.contains("Preview").should("be.visible");
+    cy.contains("Simulated (no API key set)").should("be.visible");
+
+    cy.contains("button", "Apply to editor").click();
+    cy.contains("Preview").should("not.exist");
+    cy.get("#description").invoke("val").should("not.eq", original).and("not.be.empty");
+    cy.get("#seoTitle").invoke("val").should("contain", "USB-C Hub 7-in-1");
+
+    // Applying only changes the editor's local state — nothing is saved
+    // until the user clicks Save, so a reload must revert to what's
+    // actually persisted.
+    cy.reload();
+    cy.get("#description").should("have.value", original);
+  });
 });
