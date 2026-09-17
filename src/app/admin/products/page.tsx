@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AdminTopBar } from "@/components/admin/admin-top-bar";
+import { ShopifyImportForm } from "@/components/admin/shopify-import-form";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { productService } from "@/server/services/product-service";
 
@@ -19,6 +20,8 @@ export default async function AdminProductListPage() {
             Manage description, SEO fields, and publish status.
           </p>
         </div>
+
+        <ShopifyImportForm />
 
         <div className="divide-y overflow-hidden rounded-xl border bg-card">
           {products.map((product) => (

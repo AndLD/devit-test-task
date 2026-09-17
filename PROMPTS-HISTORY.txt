@@ -349,3 +349,11 @@ Execute Phase 7 infrastructure point (DEVELOPMENT-PLAN.md)
 
 Prompt No 77
 Execute Phase 7 LLM point
+
+Prompt No 78
+Execute Phase 7 Shopify point
+
+Q/A for Prompt 78:
+Your Shopify test store has no products yet. How do you want to get one there for testing the import feature?
+
+Add 2 sample products for me to Shopify
