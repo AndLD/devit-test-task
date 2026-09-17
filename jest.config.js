@@ -38,6 +38,11 @@ module.exports = {
       transform: esmTransform,
       testEnvironment: "node",
       moduleNameMapper,
+      // next.config.ts's `output: "standalone"` copies a package.json into
+      // .next/standalone (for the Docker runtime image — see Dockerfile),
+      // which Jest's haste module map otherwise scans and can warn about as
+      // a naming collision with the real one at the project root.
+      modulePathIgnorePatterns: ["<rootDir>/.next/"],
       testMatch: ["<rootDir>/tests/unit/**/*.test.ts"],
     },
     {
@@ -47,6 +52,7 @@ module.exports = {
       transform: esmTransform,
       testEnvironment: "node",
       moduleNameMapper,
+      modulePathIgnorePatterns: ["<rootDir>/.next/"],
       testMatch: ["<rootDir>/tests/integration/**/*.test.ts"],
       globalSetup: "<rootDir>/tests/integration/support/global-setup.ts",
       globalTeardown: "<rootDir>/tests/integration/support/global-teardown.ts",
@@ -58,6 +64,7 @@ module.exports = {
       transform: cjsTransform,
       testEnvironment: "jsdom",
       moduleNameMapper,
+      modulePathIgnorePatterns: ["<rootDir>/.next/"],
       testMatch: ["<rootDir>/tests/frontend-unit/**/*.test.tsx"],
       setupFilesAfterEnv: ["<rootDir>/tests/frontend-support/setup.ts"],
     },
@@ -66,6 +73,7 @@ module.exports = {
       transform: cjsTransform,
       testEnvironment: "jsdom",
       moduleNameMapper,
+      modulePathIgnorePatterns: ["<rootDir>/.next/"],
       testMatch: ["<rootDir>/tests/frontend-integration/**/*.test.tsx"],
       setupFilesAfterEnv: ["<rootDir>/tests/frontend-support/setup.ts"],
     },

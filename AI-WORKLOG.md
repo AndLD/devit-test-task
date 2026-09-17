@@ -248,4 +248,15 @@ One bug in the tests themselves was caught this way too: an integration test ass
 - **Verification:** Re-summed the core-only phases (2:58:50 + 0:53:43 + 0:33:55 + 1:17:54 + 1:56:42 = 7:41:04) and confirmed it plus Phase 3's 1:00:43 reproduces the original Clockify-verified total of 8:41:47.
 - **Reference:** [README.md](README.md) (Time spent section)
 
+### 2026-09-17 — Bonus: Infrastructure (Docker Compose full-stack + CI)
+
+- **Task:** Implement the Infrastructure bonus per PROJECT-REQUIREMENTS.md/DEVELOPMENT-PLAN.md's Phase 7: run the whole app via Docker Compose or CI with lint/tests/build. AGENTS.md commits to both.
+- **AI contribution:**
+  - Added `output: "standalone"` to `next.config.ts` and a multi-stage `Dockerfile` (`deps` → `builder` → `runner`), so the runtime image only ships the standalone bundle, not `node_modules`/source.
+  - Extended `docker-compose.yml` with two new services: `migrate` (a one-off job on the `builder` stage running `prisma migrate deploy && npm run seed`, so `docker compose up` always starts from a migrated, seeded database) and `web` (the actual app, `depends_on: migrate: condition: service_completed_successfully`). `DATABASE_URL` is hardcoded to the `postgres` service's Compose network hostname for both, since `.env`'s `DATABASE_URL` is set up for connecting from the host machine during normal un-dockerized `npm run dev` and would be wrong inside the Compose network; JWT secrets still come from `.env` via `env_file`.
+  - Added `.github/workflows/ci.yml`: four jobs (lint/typecheck/build, backend tests, frontend tests, e2e tests with a Postgres service container) running on every push and PR, each independently so a failure is easy to pinpoint. The e2e job reuses the exact same `npm run test:e2e` script used locally, pointed at the service container instead of the Docker Compose Postgres.
+- **My contribution:** Directed the phase transition to the Infrastructure bonus item specifically (of the three listed).
+- **Verification:** `docker compose up --build` — confirmed via container logs that `migrate` applied migrations and seeded successfully before `web` started; smoke-tested the running containerized app with `curl` (catalog, published/draft product pages — including the proxy-based 404 fix — and a full `/api/admin/auth/login` round trip returning valid cookies) and in a real browser (full login → product list flow, including the `Secure` cookie flag under `NODE_ENV=production`, which browsers permit over plain HTTP specifically for `localhost`). Pushed the CI workflow and verified all four jobs pass on GitHub Actions before merging (see PR link).
+- **Reference:** [Dockerfile](Dockerfile), [docker-compose.yml](docker-compose.yml), [.github/workflows/ci.yml](.github/workflows/ci.yml), [next.config.ts](next.config.ts)
+
 <!-- Further entries appended below as implementation proceeds. -->
