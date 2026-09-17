@@ -21,8 +21,39 @@ async function hasValidAccessToken(request: NextRequest): Promise<boolean> {
   }
 }
 
+// A dynamic Server Component page that calls notFound() (see
+// src/app/products/[slug]/page.tsx) can't reliably produce a real 404 HTTP
+// status: Next may already have started streaming the response as 200 by
+// the time the page's own data fetch resolves and throws. Route Handlers
+// don't have this problem (confirmed: GET /api/products/[slug] already
+// returns a correct 404), and neither does Next's own "no route matched"
+// handling — only the in-component notFound() throw is affected. So the
+// published-or-not check is done here instead, before the page ever
+// renders, by asking the (already correct) API route; a rewrite to a path
+// that matches no route at all reliably reaches Next's built-in 404 (with
+// our custom root not-found.tsx), same as any other unmatched URL.
+async function isPublishedProductSlug(
+  request: NextRequest,
+  slug: string,
+): Promise<boolean> {
+  const apiUrl = new URL(`/api/products/${slug}`, request.url);
+  const response = await fetch(apiUrl);
+  return response.ok;
+}
+
 export async function proxy(request: NextRequest) {
-  const isLoginPage = request.nextUrl.pathname === "/admin/login";
+  const { pathname } = request.nextUrl;
+
+  const productSlugMatch = pathname.match(/^\/products\/([^/]+)$/);
+  if (productSlugMatch) {
+    const [, slug] = productSlugMatch;
+    if (!(await isPublishedProductSlug(request, slug))) {
+      return NextResponse.rewrite(new URL("/does-not-match-any-route", request.url));
+    }
+    return NextResponse.next();
+  }
+
+  const isLoginPage = pathname === "/admin/login";
   const authenticated = await hasValidAccessToken(request);
 
   if (isLoginPage) {
@@ -40,5 +71,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/admin/:path*", "/products/:slug"],
 };

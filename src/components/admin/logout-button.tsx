@@ -12,6 +12,9 @@ export function LogoutButton() {
     setPending(true);
     try {
       await apiClient.post("/api/admin/auth/logout");
+    } catch {
+      // Ignore — we navigate to /admin/login unconditionally either way,
+      // and letting this reject unhandled would surface as a console error.
     } finally {
       router.push("/admin/login");
       router.refresh();
