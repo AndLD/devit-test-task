@@ -236,7 +236,7 @@ Full principles in [AGENTS.md](AGENTS.md).
 
 ## Time spent
 
-Tracked attentively in Clockify (not estimated from commit timestamps — an earlier draft of this section did that and undercounted real elapsed time, since it couldn't see breaks between work sessions). Figures below are from Clockify's latest full report covering the whole project (14–20 Sep 2026, total **16h39m28s**), superseding an earlier full report (13h46m42s) that predates the LLM/Shopify test-coverage work, the codebase-quality review, the manual testing guide, and the from-scratch setup verification. Per-phase durations are exact where a logged time entry maps to a single activity; where one entry spans multiple named activities (e.g. "Execute Phase 4 + Fix missing-slug + ... + Execute Phase 5"), its duration is split evenly across the number of activities named, since Clockify's summary export doesn't sub-divide a single tracked entry any further. All figures below were verified to sum back to the report's own total.
+Tracked attentively in Clockify (not estimated from commit timestamps — an earlier draft of this section did that and undercounted real elapsed time, since it couldn't see breaks between work sessions). Figures below are from Clockify's latest full report covering the whole project (14–20 Sep 2026, total **17h03m42s**), superseding an earlier full report (16h39m28s) that predates the Postgres env-var consolidation work. Per-phase durations are exact where a logged time entry maps to a single activity; where one entry spans multiple named activities (e.g. "Execute Phase 4 + Fix missing-slug + ... + Execute Phase 5"), its duration is split evenly across the number of activities named, since Clockify's summary export doesn't sub-divide a single tracked entry any further. All figures below were verified to sum back to the report's own total.
 
 **Core budget (target: 6–8h):**
 
@@ -259,7 +259,8 @@ This runs about an hour over the 6–8h target in AGENTS.md — not from the ori
 | Phase 6 — finalize README.md/AI-WORKLOG.md, requirements-compliance review, [AI-WORKLOG-SUMMARY.md](AI-WORKLOG-SUMMARY.md) | 1h15m09s     |
 | Docs fixes made alongside later bonus/polish work (md-doc corrections, disclosing the Figma/bonus-UI scope gap) | 38m42s       |
 | Later docs work (CI-skip policy, [PROMPTS-HISTORY.md](PROMPTS-HISTORY.md) conversion + sync fixes, [CODE-QUALITY-REVIEW.md](CODE-QUALITY-REVIEW.md), test-count table, Getting-started fix, [MANUAL-TESTING-GUIDE.md](MANUAL-TESTING-GUIDE.md), doc-linking, time report updates) | 1h29m00s     |
-| **Docs total**                                                             | **3h22m51s** |
+| Docs alongside the Postgres env-var consolidation                         | 12m07s       |
+| **Docs total**                                                             | **3h34m58s** |
 
 **Bonus budget (separate target: ~2–3h, not counted against the core budget above):**
 
@@ -268,13 +269,13 @@ This runs about an hour over the 6–8h target in AGENTS.md — not from the ori
 | Design Tools (Phase 3 Figma design via MCP, plus the later admin-header fix to match it) | 1h10m04s     |
 | LLM integration (OpenAI, incl. later unit-test coverage work)                  | 49m41s       |
 | Shopify import (incl. later unit-test coverage work)                          | 1h19m51s     |
-| Infrastructure (Docker Compose full-stack + CI, incl. later from-scratch verification) | 19m57s       |
+| Infrastructure (Docker Compose full-stack + CI, incl. later from-scratch verification and the Postgres env-var consolidation) | 32m04s       |
 | Cross-cutting: backend axios migration (benefits both the LLM and Shopify integrations) | 35m36s       |
-| **Bonus total**                                                                | **4h15m09s** |
+| **Bonus total**                                                                | **4h27m16s** |
 
-The bonus total runs noticeably over the ~2–3h allotment in AGENTS.md, mainly because all four bonus tasks were attempted (the plan only committed to attempting them, not to finishing all four within budget) and because the Shopify integration needed a second, unplanned pass when Shopify deprecated its legacy static-token auth flow mid-project (see "Shopify auth updated for the new Dev Dashboard flow" in [AI-WORKLOG.md](AI-WORKLOG.md)). Design Tools' own time also grew slightly after the Figma mockups were revisited to fix the admin header, and the LLM/Shopify/Infrastructure figures grew further after closing the test-coverage gap identified in [CODE-QUALITY-REVIEW.md](CODE-QUALITY-REVIEW.md) and re-verifying the from-scratch setup flows.
+The bonus total runs noticeably over the ~2–3h allotment in AGENTS.md, mainly because all four bonus tasks were attempted (the plan only committed to attempting them, not to finishing all four within budget) and because the Shopify integration needed a second, unplanned pass when Shopify deprecated its legacy static-token auth flow mid-project (see "Shopify auth updated for the new Dev Dashboard flow" in [AI-WORKLOG.md](AI-WORKLOG.md)). Design Tools' own time also grew slightly after the Figma mockups were revisited to fix the admin header, and the LLM/Shopify/Infrastructure figures grew further after closing the test-coverage gap identified in [CODE-QUALITY-REVIEW.md](CODE-QUALITY-REVIEW.md), re-verifying the from-scratch setup flows, and consolidating the duplicated Postgres env vars.
 
-**Grand total (core + docs + bonus): 16h39m28s**, matching the Clockify report's own reported total exactly.
+**Grand total (core + docs + bonus): 17h03m42s**, matching the Clockify report's own reported total exactly.
 
 ## Bonus features
 
