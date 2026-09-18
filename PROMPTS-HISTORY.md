@@ -395,8 +395,8 @@ Replace fetch browser requests with axios
 Okay, then replace fetch with axios also for backend node.js side (and define it as instruction to AGENTS.md)
 
 ## Prompt No 86
-Fix header title on Admin header: instead "Products" write project title to match the UI design.
-Also check how admin header looks like in the Figma design. In code it currently have width limitation the same as products list width limitation, while header should not included to width limitation according to the design.
+- Fix header title on Admin header: instead "Products" write project title to match the UI design.
+- Also check how admin header looks like in the Figma design. In code it currently have width limitation the same as products list width limitation, while header should not included to width limitation according to the design.
 
 ## Prompt No 87
 Check if we highlighted that the UI design on Figma not includes bonus features like LLM and Shopify tasks.
@@ -416,3 +416,9 @@ Turn PROMPTS-HISTORY into md also
 
 ## Prompt No 92
 PROMPTS-HISTORY.md contains formatting error: the logs wrapper in Prompt No 47 is too broad and covered all the next prompts. Check and fix
+
+## Prompt No 93
+Try again
+
+## Prompt No 94
+Verify PROMPTS-HISTORY is synchronised with our chat history
