@@ -1,3 +1,5 @@
+import type { AxiosInstance, AxiosResponse } from "axios";
+import { httpClient } from "@/server/lib/http-client";
 import { ShopifyClientError } from "./types";
 
 // Shopify deprecated static Admin API access tokens for newly-created
@@ -32,6 +34,9 @@ export class ClientCredentialsTokenProvider implements ShopifyTokenProvider {
     private readonly storeDomain: string,
     private readonly clientId: string,
     private readonly clientSecret: string,
+    // Injectable for testing (see AGENTS.md's testability principle) —
+    // defaults to the shared server-side axios instance.
+    private readonly http: AxiosInstance = httpClient,
   ) {}
 
   async getAccessToken(): Promise<string> {
@@ -39,28 +44,28 @@ export class ClientCredentialsTokenProvider implements ShopifyTokenProvider {
       return this.cached.token;
     }
 
-    let response: Response;
+    let response: AxiosResponse;
     try {
-      response = await fetch(`https://${this.storeDomain}/admin/oauth/access_token`, {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({
+      response = await this.http.post(
+        `https://${this.storeDomain}/admin/oauth/access_token`,
+        new URLSearchParams({
           grant_type: "client_credentials",
           client_id: this.clientId,
           client_secret: this.clientSecret,
         }),
-      });
+        { headers: { "Content-Type": "application/x-www-form-urlencoded" } },
+      );
     } catch {
       throw new ShopifyClientError("Could not reach Shopify to obtain an access token.");
     }
 
-    if (!response.ok) {
+    if (response.status < 200 || response.status >= 300) {
       throw new ShopifyClientError(
         `Shopify token exchange failed with status ${response.status}. Confirm the app is installed on this store and both are in the same Shopify organization.`,
       );
     }
 
-    const payload = await response.json().catch(() => null);
+    const payload = response.data;
     if (
       typeof payload?.access_token !== "string" ||
       typeof payload?.expires_in !== "number"

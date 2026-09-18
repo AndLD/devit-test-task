@@ -11,7 +11,7 @@ A small product-card editor for an online store: managers edit description/SEO f
 - **Validation:** Zod
 - **Auth:** JWT
 - **UI:** shadcn/ui (Tailwind)
-- **Client-side HTTP:** axios (not native `fetch`) for all requests from the browser
+- **HTTP client:** axios (not native `fetch`) for both browser requests and Node.js server-side calls to third-party APIs (OpenAI, Shopify) — the one exception is `src/proxy.ts`, which runs on the Edge runtime and must use `fetch`
 - **Testing:** Jest (backend unit + integration, and frontend component unit + integration), with `testcontainers`-backed ephemeral PostgreSQL for backend integration tests, plus Cypress for end-to-end tests
 - **Tooling:** ESLint + Prettier, npm
 
@@ -179,6 +179,7 @@ Current folder structure:
 - `src/server/auth/` — `passwords.ts` (bcrypt hashing), `tokens.ts` (sign/verify access+refresh JWTs via `jose`, refresh-token hashing), `cookies.ts` (cookie read/write helpers), `guard.ts` (`requireAdminId(request)` used by admin Route Handlers).
 - `src/server/repositories/` — thin Prisma wrappers (`AdminUserRepository`, `RefreshTokenRepository`, `ProductRepository`), the only layer that imports the generated Prisma client.
 - `src/server/services/` — framework-free business logic (`AuthService`, `ProductService`) built on repository interfaces, so they're unit-testable with fake repositories (no DB, no Next.js) per the testability principle in [AGENTS.md](AGENTS.md).
+- `src/server/lib/http-client.ts` — shared axios instance for server-side (Node.js) calls to third-party APIs, mirroring `src/lib/api-client.ts`'s browser instance; used by the OpenAI and Shopify integrations below.
 - `src/server/services/llm/` — the LLM bonus's provider abstraction: `types.ts` (the `LlmProvider` interface), `mock-provider.ts` / `openai-provider.ts` (the two implementations), `suggestion-service.ts` (picks one based on `OPENAI_API_KEY` and validates the result) — see "AI content suggestions" above.
 - `src/server/services/shopify/` — the Shopify import bonus: `types.ts` (the `ShopifyClient` interface), `shopify-client.ts` (the real Admin API client), `token-provider.ts` (the two auth methods — a static token, or the client-credentials exchange with auto-refresh), `mapper.ts` (Shopify product → this app's fields, with the same truncate/validate pass as the LLM feature), `import-service.ts` (slug uniqueness + the actual DB write) — see "Shopify import" above.
 - `src/lib/validation/` — Zod schemas (`product.ts`, `auth.ts`) shared by client forms (Phase 4) and server Route Handlers, so invalid data is rejected identically everywhere, including direct API calls.

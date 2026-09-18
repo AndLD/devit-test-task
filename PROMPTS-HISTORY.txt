@@ -377,3 +377,9 @@ Q/A for Prompt 83:
 Given the token now expires every ~24h, how do you want to handle it?
 
 Implement the client-credentials flow in the app
+
+Prompt No 84
+Replace fetch browser requests with axios
+
+Prompt No 85
+Okay, then replace fetch with axios also for backend node.js side (and define it as instruction to AGENTS.md)
