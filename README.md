@@ -32,8 +32,8 @@ nvm use
 # 1. Install dependencies
 npm install
 
-# 2. Start local PostgreSQL
-docker compose up -d
+# 2. Start local PostgreSQL (just this one service — see note below)
+docker compose up -d postgres
 
 # 3. Configure environment
 cp .env.example .env
@@ -49,6 +49,8 @@ npm run seed
 # 6. Run the app
 npm run dev
 ```
+
+**Note on step 2:** `docker-compose.yml` also defines `migrate` and `web` (see "Running the whole app via Docker Compose" below) — a bare `docker compose up -d` with no service name starts all three, which would build and start a containerized `web` on port 3000 before you've even set up `.env`, colliding with `npm run dev` in step 6. Naming `postgres` explicitly starts only the database, matching the "Postgres in Docker, Next.js locally" development setup this project actually uses.
 
 The app is available at `http://localhost:3000`. Admin pages (`/admin/login`, `/admin/products`, `/admin/products/[id]`) and the public pages (`/` catalog, `/products/[slug]`) are fully wired to the backend below. The backend can also be exercised directly:
 
@@ -92,7 +94,7 @@ npm run test:integration        # backend Route Handlers — spins up a real eph
 npm run test:frontend           # frontend component unit + integration tests (jsdom, no server, no DB)
 npm run test:frontend-unit
 npm run test:frontend-integration
-npm run test:e2e                # Cypress against a real `next dev` server and the Docker Compose Postgres (needs docker compose up + migrations already applied)
+npm run test:e2e                # Cypress against a real `next dev` server and the Docker Compose Postgres (needs docker compose up -d postgres + migrations already applied)
 ```
 
 All four Jest suites (`test:unit`, `test:integration`, `test:frontend-unit`, `test:frontend-integration`) are fully reproducible and need no external services or API keys — `test:integration` only needs a local Docker daemon, the same one used for `docker compose up`. No `.env` is required for them: they use fixed test-only JWT secrets and a Postgres container testcontainers starts and tears down itself.
