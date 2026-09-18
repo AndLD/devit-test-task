@@ -352,4 +352,12 @@ One bug in the tests themselves was caught this way too: an integration test ass
 - **Verification:** `diff` between the original file (with only its two label patterns mechanically substituted) and the new file's body confirmed an exact match — no content was altered, added, or dropped in the conversion. `grep -rn "PROMPTS-HISTORY.txt"` across all `.md` files afterward found only expected verbatim quotes inside PROMPTS-HISTORY.md itself; every other reference now points to the `.md` file.
 - **Reference:** [PROMPTS-HISTORY.md](PROMPTS-HISTORY.md), [AGENTS.md](AGENTS.md) (Logging to PROMPTS-HISTORY.md section)
 
+### 2026-09-18 — Fix: unterminated code fence in PROMPTS-HISTORY.md swallowed later prompts
+
+- **Task:** The user spotted that the pasted-terminal-log code block in Prompt No 47 (added during last session's txt→md conversion) was rendering too broad, visually absorbing several of the following prompts.
+- **AI contribution:** Found the root cause: three of the file's fenced blocks (Prompts 47/48, 51) had their closing ` ``` ` on the same line as trailing log text (e.g. `andrey@Andriis-Laptop devit-test-task % ```), and CommonMark only recognizes a closing fence when the line contains nothing but the fence characters. Since none of those "closing" lines actually closed anything, the very first opening fence (Prompt 47) stayed open through the rest of the file — every fenced block after it was just literal content of one giant unterminated code block, and everything past the last fence (from Prompt 49 onward) was silently swallowed into it too. Fixed all three blocks by moving the leading/trailing terminal-prompt text onto its own line, so each fence marker sits alone on its line. Diffed against the pre-fix version to confirm the change touched only fence placement — zero characters of the actual logged content were added, removed, or reworded.
+- **My contribution:** Caught the rendering bug and reported which prompt it originated from.
+- **Verification:** `grep -n '```'` before the fix showed only 6 markers total for what should have been 3 balanced pairs, several with trailing content past the backticks (evidence they weren't real closing fences); after the fix, all 6 markers sit alone on their own line and pair up correctly (187/207, 212/243, 255/276). Re-read the file end-to-end afterward to confirm `## Prompt No 48` onward render as real headings again, not code-block content.
+- **Reference:** [PROMPTS-HISTORY.md](PROMPTS-HISTORY.md)
+
 <!-- Further entries appended below as implementation proceeds. -->
