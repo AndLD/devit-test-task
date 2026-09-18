@@ -483,4 +483,12 @@ One bug in the tests themselves was caught this way too: an integration test ass
 - **Verification:** Every claim above is the direct output of a command run in this turn — container states via `docker compose ps`, build/migrate success via their own logs, and app correctness via `curl` status codes plus live browser interaction — not inferred from the code or from what the docs say should happen.
 - **Reference:** [README.md](README.md) (Getting started, Running the whole app via Docker Compose sections), [docker-compose.yml](docker-compose.yml)
 
+### 2026-09-18 — Re-verify PROMPTS-HISTORY.md sync (no drift found)
+
+- **Task:** The user asked for another sync check of PROMPTS-HISTORY.md against the actual chat history, following up on the two real gaps found earlier in the session (the dropped bullet dashes in Prompt 86, and the wholly-missing "Try again" message backfilled as Prompt 93).
+- **AI contribution:** This time, the full conversation (Prompts 86–106) was directly visible in context rather than reconstructed from a compaction summary, so each entry from Prompt 96 onward was compared character-for-character against the actual message text rather than against a paraphrase. Also re-ran the numbering-continuity check (`grep`/`awk` over `## Prompt No <n>` headers — only the pre-existing, already-documented gap at No. 11 remains) and the code-fence balance check (`grep -c` for `` ``` `` — 6 markers, 3 balanced pairs, matching the fix from the earlier formatting-bug pass). No discrepancies found this time.
+- **My contribution:** Asked for the recheck.
+- **Verification:** Direct line-by-line comparison against this session's own visible message history (not a summary), plus the same two mechanical checks (numbering, fence balance) used in the prior sync passes.
+- **Reference:** [PROMPTS-HISTORY.md](PROMPTS-HISTORY.md)
+
 <!-- Further entries appended below as implementation proceeds. -->

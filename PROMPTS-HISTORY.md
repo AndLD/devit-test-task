@@ -471,3 +471,6 @@ Provide manual testing instruction for checking the core user flows and write th
 
 ## Prompt No 106
 Destroy active docker containers and execute Getting started flow yourself and verify it is running correct. Then destroy containers and run full containerized version from scratch and verify it is running correct
+
+## Prompt No 107
+- Verify PROMPTS-HISTORY is sync.
