@@ -336,4 +336,12 @@ One bug in the tests themselves was caught this way too: an integration test ass
 - **Verification:** Re-summed every category and the grand total by hand against the PDF's own reported total (13h46m42s) — exact match. No code changed, so no test suite run; `git log --all --date=format:'%Y-%m-%d %H:%M:%S'` was used to verify the two corrected date headers against actual commit timestamps.
 - **Reference:** [README.md](README.md) (Time spent section), [AI-WORKLOG.md](AI-WORKLOG.md)
 
+### 2026-09-18 — Git workflow policy: skip the CI wait for docs-only PRs
+
+- **Task:** The user asked for a standing rule in AGENTS.md: don't wait for CI checks before merging a PR that only touches docs.
+- **AI contribution:** Added a bullet under the existing "Pull requests" policy in AGENTS.md's Git workflow section, scoping the exception precisely — only PRs touching exclusively `.md` files (README.md, AGENTS.md, AI-WORKLOG.md, PROMPTS-HISTORY.txt, etc.) qualify, with the reasoning stated (none of the four CI jobs — lint/typecheck/build, backend/frontend/e2e tests — exercise doc content, so waiting on them for a docs-only change is a wait for a knowably-irrelevant result). Every prior PR in this session that touched code (#9–#14) still needed a full green `gh pr checks --watch` before merging; the exception only applies going forward and only to future docs-only PRs (this instruction's own PR is itself docs-only, so it's the first to use it).
+- **My contribution:** Made the policy call.
+- **Verification:** Docs-only change (AGENTS.md is itself an `.md` file, so this PR qualifies for the exception it defines) — no CI wait needed per the new rule itself; confirmed by reading the diff before merging that no non-`.md` file was touched.
+- **Reference:** [AGENTS.md](AGENTS.md) (Git workflow section)
+
 <!-- Further entries appended below as implementation proceeds. -->
