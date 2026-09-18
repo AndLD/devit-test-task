@@ -25,7 +25,7 @@ export default async function AdminProductEditorPage({
 
   return (
     <>
-      <AdminTopBar title="Edit product" />
+      <AdminTopBar />
       <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-8 sm:px-10">
         <Link
           href="/admin/products"
