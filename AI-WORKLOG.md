@@ -240,7 +240,7 @@ One bug in the tests themselves was caught this way too: an integration test ass
 - **Verification:** Summed the relevant Clockify entry durations against each day's reported total and confirmed exact matches (to the second) for all three days before editing anything.
 - **Reference:** [AI-WORKLOG.md](AI-WORKLOG.md)
 
-### 2026-09-17 — Correction: Phase 3 (design) time moved from core to bonus budget
+### 2026-09-18 — Correction: Phase 3 (design) time moved from core to bonus budget
 
 - **Task:** After a full requirements-compliance review, the user pointed out that the "Time spent" section's core total (8h41m47s) wrongly included Phase 3 (Figma design, ~1h00m43s) — Design Tools is explicitly a bonus item in PROJECT-REQUIREMENTS.md, and AGENTS.md's own time-budget policy says bonus work isn't counted against the 6–8h core budget.
 - **AI contribution:** Split README's "Time spent" section into a "Core budget" table (Planning + Phases 1/2/4/5, excluding design) totaling **7h41m04s** — which now fits inside the stated 6–8h core budget — and a separate "Bonus budget" table showing Phase 3's 1h00m43s against the ~2–3h bonus allotment. Cross-referenced the same figure into the Bonus features table's Design Tools row.
@@ -248,7 +248,7 @@ One bug in the tests themselves was caught this way too: an integration test ass
 - **Verification:** Re-summed the core-only phases (2:58:50 + 0:53:43 + 0:33:55 + 1:17:54 + 1:56:42 = 7:41:04) and confirmed it plus Phase 3's 1:00:43 reproduces the original Clockify-verified total of 8:41:47.
 - **Reference:** [README.md](README.md) (Time spent section)
 
-### 2026-09-17 — Bonus: Infrastructure (Docker Compose full-stack + CI)
+### 2026-09-18 — Bonus: Infrastructure (Docker Compose full-stack + CI)
 
 - **Task:** Implement the Infrastructure bonus per PROJECT-REQUIREMENTS.md/DEVELOPMENT-PLAN.md's Phase 7: run the whole app via Docker Compose or CI with lint/tests/build. AGENTS.md commits to both.
 - **AI contribution:**
@@ -323,5 +323,17 @@ One bug in the tests themselves was caught this way too: an integration test ass
 - **My contribution:** Asked the question that surfaced the gap; confirmed the fix should go in before approving it.
 - **Verification:** Docs-only change — reviewed by re-reading both edited sections of README.md for consistency with the rest of the file's existing claims.
 - **Reference:** [README.md](README.md)
+
+### 2026-09-18 — Correction: updated Clockify export, fixed two mislabeled dates, added Docs/Bonus time breakdown
+
+- **Task:** The user supplied an updated Clockify export for the same 14–20 Sep 2026 date range (this one covering the whole project, total 13h46m42s, vs. the earlier partial export used previously — 8h41m47s, through Phase 5 only), asked to fix any entry dates in AI-WORKLOG.md that should be 09-18 instead of 09-17, and asked for the time spent on docs and on bonus features to be written down explicitly.
+- **AI contribution:**
+  - Cross-checked every AI-WORKLOG.md entry header against `git log --all` commit timestamps again (same method as the prior date-correction entry). Found two mislabeled headers whose commits actually landed after midnight on 2026-09-18: "Correction: Phase 3 (design) time moved from core to bonus budget" (commit `Split time budget by core/bonus...` at 2026-09-18 01:21:42) and "Bonus: Infrastructure (Docker Compose full-stack + CI)" (commit `Add Infrastructure bonus...` at 2026-09-18 01:45:37) — both were dated 2026-09-17. Fixed both headers; every other header still matched its commit's actual date.
+  - **⭐ Notable decision — recomputed the entire "Time spent" section from scratch against the new report rather than patching the old numbers.** The new export's per-Phase totals (Phase 1/2/4/5) matched the previous README figures exactly once mapped through the same "split evenly across an entry's named activities" methodology already established — confirming that methodology was sound — but two new facts emerged only in this fuller export: a "Planning final steps" entry (27m55s) not present in the earlier partial export, and an entire tail of Docs/Bonus-feature entries (Phase 6, the two Figma-design entries, both Phase 7 bonus entries, the backend axios migration, the admin-header fix, and the Figma-scope disclosure) that the earlier partial export didn't cover at all (it stopped at Phase 5). Rebuilt the Core/Bonus split, and added a third **Docs budget** section and a five-line **Bonus budget** breakdown (Design Tools, LLM, Shopify, Infrastructure, and a "Cross-cutting: backend axios migration" line for the one activity that touches both the LLM and Shopify integration code and doesn't belong to either alone) — directly answering the request to state docs and bonus-feature time explicitly, not just a single bonus-budget total as before.
+  - Verified the arithmetic three ways before writing it: (1) each multi-activity entry's per-activity split summed back to that entry's own duration; (2) each category's entries summed to that category's stated total (Core 8h08m59s, Docs 1h53m51s, Bonus 3h43m52s); (3) the three category totals summed to the report's own grand total (13h46m42s) exactly, to the second.
+  - Flagged (rather than silently absorbing) that the Core total is now ~9 minutes over the 6–8h AGENTS.md target, and that the Bonus total runs well over its ~2–3h allotment — both stated plainly in README with the concrete reason (a previously-uncaptured planning entry for Core; attempting all four bonus tasks, including an unplanned second pass on Shopify auth, for Bonus) rather than adjusted to look tidier.
+- **My contribution:** Supplied the updated, more complete Clockify export and specified exactly what breakdown was needed (dates fixed; docs and bonus-feature time separately called out).
+- **Verification:** Re-summed every category and the grand total by hand against the PDF's own reported total (13h46m42s) — exact match. No code changed, so no test suite run; `git log --all --date=format:'%Y-%m-%d %H:%M:%S'` was used to verify the two corrected date headers against actual commit timestamps.
+- **Reference:** [README.md](README.md) (Time spent section), [AI-WORKLOG.md](AI-WORKLOG.md)
 
 <!-- Further entries appended below as implementation proceeds. -->
