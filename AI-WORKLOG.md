@@ -531,4 +531,18 @@ One bug in the tests themselves was caught this way too: an integration test ass
 - **Verification:** Arithmetic re-checked twice: the report-level delta (24m14s) matches the one new row's own duration exactly, and the three updated category totals sum to 17h03m42s exactly, matching the report's own reported total.
 - **Reference:** [README.md](README.md) (Time spent section)
 
+### 2026-09-18 — Final reviewer-readiness verification
+
+- **Task:** The user asked for a final check that the project is genuinely ready to hand to a reviewer, right after `develop` was merged into `main`.
+- **AI contribution:** Checked the things a reviewer would actually hit, each verified directly rather than assumed:
+  - **Repository state:** `gh repo view` confirms `PUBLIC` visibility and `main` as the default branch (what a reviewer lands on without needing to be told). `git diff origin/main origin/develop` is empty — the two branches are byte-identical, nothing left unmerged. No open PRs.
+  - **CI on `main` itself:** the push-triggered run from the merge (not just the PR's own run) was watched to completion — all four jobs (`lint-typecheck-build`, `backend-tests`, `frontend-tests`, `e2e-tests`) green.
+  - **A genuine fresh clone**, not the local working copy: `git clone --branch main` into a scratch directory, confirming no `.env` is present (only `.env.example`), and a final `grep` for common secret-key patterns (OpenAI/Shopify prefixes) across the checkout came back empty. Ran `npm install` → `npx prisma generate` → `lint` → `build` → `tsc --noEmit` → unit + frontend tests (112 tests) from that clone alone, with no reference to anything already set up in the working project directory — all clean/passing, confirming the repository content itself (not just the local dev environment's accumulated state) is sufficient to reproduce a working setup.
+  - **Full local test suite**, one final time: 84 unit + 25 integration (real testcontainers Postgres) + 28 frontend + 15 Cypress e2e = **152/152 passing**, matching what CI reports.
+  - **PROMPTS-HISTORY.md sync**: found two more messages logged since the last check ("merge develop to main", and this readiness-check request itself) — appended as Prompt No 114–115.
+  - Confirmed the local dev Postgres container (used throughout this session, still running the whole time) was untouched by any of the above — the fresh-clone checks intentionally avoided Docker to sidestep a port-5432 conflict with it, relying instead on the already-thorough from-scratch Docker verification done earlier this session (and re-confirmed via CI's own independent Postgres service container) for that part of the picture.
+- **My contribution:** Asked for the final go/no-go check before considering the submission complete.
+- **Verification:** Every claim in this entry is the direct result of a command run in this turn against the real, live GitHub state (not the local working copy) or a genuinely fresh clone — not a re-statement of earlier verification passes.
+- **Reference:** [README.md](README.md), [PROMPTS-HISTORY.md](PROMPTS-HISTORY.md)
+
 <!-- Further entries appended below as implementation proceeds. -->
