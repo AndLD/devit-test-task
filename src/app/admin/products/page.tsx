@@ -12,7 +12,7 @@ export default async function AdminProductListPage() {
 
   return (
     <>
-      <AdminTopBar title="Products" />
+      <AdminTopBar />
       <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-8 sm:px-10">
         <div className="mb-6 space-y-1">
           <h1 className="text-2xl font-semibold">Products</h1>
