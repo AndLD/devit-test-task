@@ -87,6 +87,8 @@ docker compose up --build
 
 This starts three services: `postgres` (same as above), a one-off `migrate` job that applies migrations and seeds the test admin/demo products then exits, and `web` (the Next.js app itself, built via the multi-stage [Dockerfile](Dockerfile) using `next.config.ts`'s `output: "standalone"`) — available at `http://localhost:3000` once `migrate` finishes successfully. JWT secrets are read from your `.env` if present (see Environment variables below); `DATABASE_URL` is fixed to point at the `postgres` service by its Compose network hostname rather than `localhost`, so it doesn't need to be (and isn't) read from `.env` for these two services.
 
+`POSTGRES_USER`/`POSTGRES_PASSWORD`/`POSTGRES_DB` (see `.env.example`) are the single source of truth for the Postgres credentials/db name across all three services — the `postgres` service reads them directly, and `docker-compose.yml`'s `migrate`/`web` services interpolate the same three vars into their `DATABASE_URL` via a shared YAML anchor, rather than the connection string being hardcoded separately in each. Change them in `.env` and every service picks it up automatically; the host-based `DATABASE_URL` above (for `npm run dev`) is the one exception that still needs to be kept in sync by hand, since plain `dotenv` doesn't expand `${...}` inside `.env` values — see the comments in `.env.example` and `docker-compose.yml`.
+
 ## Test admin credentials
 
 Seeded by `npm run seed` (override via `SEED_ADMIN_EMAIL`/`SEED_ADMIN_PASSWORD` in `.env` before seeding):
@@ -155,7 +157,8 @@ Two real bugs surfaced while writing these tests, not by inspection:
 
 See `.env.example` for the full list (no real secrets committed). Expected variables include:
 
-- `DATABASE_URL` — PostgreSQL connection string
+- `POSTGRES_USER` / `POSTGRES_PASSWORD` / `POSTGRES_DB` — the Postgres credentials/db name; single source of truth for the Docker Compose services (see "Running the whole app via Docker Compose" above)
+- `DATABASE_URL` — PostgreSQL connection string for connecting from the host machine (must be kept in sync with the three vars above if you change them)
 - `JWT_ACCESS_SECRET` / `JWT_REFRESH_SECRET` — signing secrets for the access+refresh token auth pattern
 - `OPENAI_API_KEY` — optional, only needed to exercise the real (non-mocked) LLM bonus feature
 - `SHOPIFY_STORE_DOMAIN` — optional, only needed for the Shopify import bonus feature
