@@ -42,8 +42,14 @@ Approved implementation plan for Product Content Studio. Strategic decisions beh
 
 ## Phase 5 — Automated tests
 
-- Unit tests (no DB): validation rules, status/visibility rules, auth/token checks — core business logic isolated from framework glue.
-- Integration tests: API routes exercised against a real ephemeral PostgreSQL instance via `testcontainers` (no external services, no cloud dependency, no API keys required to run). Cover critical scenarios: save validation (including direct/invalid API calls), draft invisibility on public catalog/API, auth gating of admin routes.
+- **Backend unit tests** (no DB): validation rules, status/visibility rules, auth/token checks — core business logic isolated from framework glue.
+- **Backend integration tests**: API routes exercised against a real ephemeral PostgreSQL instance via `testcontainers` (no external services, no cloud dependency, no API keys required to run). Cover critical scenarios: save validation (including direct/invalid API calls), draft invisibility on public catalog/API, auth gating of admin routes.
+- **Frontend unit tests** (React Testing Library + `jest-environment-jsdom`, no HTTP): presentational components (`StatusBadge`) and a component's client-side validation logic (e.g. the product editor's Save button disabling on invalid input) without touching the network layer.
+- **Frontend integration tests** (same tooling, HTTP layer mocked via `jest.mock`, not a real server): a component's full interaction cycle — the login form, the product editor's save flow (success, server-rejected/invalid save leaving entered values intact, session-expired redirect, network error), and the logout button.
+- **End-to-end tests (Cypress)**: run against a real `next dev` server and the Docker Compose PostgreSQL (seeded before the run), covering the core user flows for both sides:
+  - Admin: login (wrong password / success), an authenticated session redirecting away from `/admin/login`, unauthenticated access to `/admin/products` redirecting to login, the product list showing both draft and published items, opening the editor and saving a change (verified to persist across reload), the Save button disabling on invalid input, and logout revoking the session.
+  - Public: the catalog listing only published products, opening a product page and seeing its content and SEO title, and a draft product 404ing by direct URL.
+  - Cross-cutting: publishing a draft from the admin editor makes it appear in the public catalog, and unpublishing it removes it again — restored to its original seeded state at the end of the test.
 - Document the testing strategy and rationale in README.md.
 
 ## Phase 6 — Docs pass

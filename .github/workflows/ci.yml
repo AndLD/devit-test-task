@@ -1,0 +1,103 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+# A fresh push to the same branch/PR cancels any run still in flight for it.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Dummy values: real database access happens via testcontainers (backend
+  # integration tests) or the postgres service container (e2e) below, never
+  # this one — it only needs to exist so module-load-time reads of
+  # process.env don't see `undefined` (see src/server/db/client.ts).
+  DATABASE_URL: postgresql://postgres:postgres@localhost:5432/product_content_studio?schema=public
+  JWT_ACCESS_SECRET: ci-access-secret-not-a-real-secret
+  JWT_REFRESH_SECRET: ci-refresh-secret-not-a-real-secret
+
+jobs:
+  lint-typecheck-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+      - run: npm ci
+      - run: npx prisma generate
+      # tsc needs Next's generated ambient types (LayoutProps/PageProps
+      # helpers, etc.) in .next/types, which only exist after `next dev` or
+      # `next build` has run at least once — `next typegen` generates just
+      # those without a full build, for a fresh checkout with no .next yet.
+      - run: npx next typegen
+      - run: npx tsc --noEmit
+      - run: npx tsc --noEmit -p cypress/tsconfig.json
+      - run: npm run lint
+      - run: npm run build
+
+  backend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+      - run: npm ci
+      - run: npx prisma generate
+      - name: Unit tests (no DB)
+        run: npm run test:unit
+      - name: Integration tests (testcontainers Postgres)
+        run: npm run test:integration
+
+  frontend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npm run test:frontend
+
+  e2e-tests:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: product_content_studio
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npx prisma migrate deploy
+      - run: npx cypress install
+      - run: npm run test:e2e
+      - name: Upload Cypress screenshots on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-screenshots
+          path: cypress/screenshots
+          if-no-files-found: ignore
