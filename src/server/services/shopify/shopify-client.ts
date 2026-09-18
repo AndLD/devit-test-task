@@ -4,6 +4,11 @@ import {
   type ShopifyClient,
   type ShopifyProductData,
 } from "./types";
+import {
+  ClientCredentialsTokenProvider,
+  StaticTokenProvider,
+  type ShopifyTokenProvider,
+} from "./token-provider";
 
 const API_VERSION = "2024-10";
 
@@ -18,21 +23,24 @@ interface ShopifyRestProduct {
 }
 
 // Real Shopify Admin API (REST) client. Needs SHOPIFY_STORE_DOMAIN (e.g.
-// "my-shop.myshopify.com") and SHOPIFY_ADMIN_API_TOKEN — see .env.example
-// and README's Shopify import section.
+// "my-shop.myshopify.com") and either SHOPIFY_ADMIN_API_TOKEN (a pre-2026
+// legacy custom app's static token) or SHOPIFY_CLIENT_ID +
+// SHOPIFY_CLIENT_SECRET (the current Dev Dashboard flow) — see
+// .env.example and README's Shopify import section.
 export class ShopifyAdminApiClient implements ShopifyClient {
   constructor(
     private readonly storeDomain: string,
-    private readonly accessToken: string,
+    private readonly tokenProvider: ShopifyTokenProvider,
   ) {}
 
   async fetchProduct(productId: string): Promise<ShopifyProductData> {
     const url = `https://${this.storeDomain}/admin/api/${API_VERSION}/products/${productId}.json`;
+    const accessToken = await this.tokenProvider.getAccessToken();
 
     let response: Response;
     try {
       response = await fetch(url, {
-        headers: { "X-Shopify-Access-Token": this.accessToken },
+        headers: { "X-Shopify-Access-Token": accessToken },
       });
     } catch {
       throw new ShopifyClientError("Could not reach the Shopify Admin API.");
@@ -67,7 +75,21 @@ export class ShopifyAdminApiClient implements ShopifyClient {
 
 export function resolveShopifyClient(): ShopifyClient | null {
   const storeDomain = process.env.SHOPIFY_STORE_DOMAIN;
-  const accessToken = process.env.SHOPIFY_ADMIN_API_TOKEN;
-  if (!storeDomain || !accessToken) return null;
-  return new ShopifyAdminApiClient(storeDomain, accessToken);
+  if (!storeDomain) return null;
+
+  const staticToken = process.env.SHOPIFY_ADMIN_API_TOKEN;
+  if (staticToken) {
+    return new ShopifyAdminApiClient(storeDomain, new StaticTokenProvider(staticToken));
+  }
+
+  const clientId = process.env.SHOPIFY_CLIENT_ID;
+  const clientSecret = process.env.SHOPIFY_CLIENT_SECRET;
+  if (clientId && clientSecret) {
+    return new ShopifyAdminApiClient(
+      storeDomain,
+      new ClientCredentialsTokenProvider(storeDomain, clientId, clientSecret),
+    );
+  }
+
+  return null;
 }

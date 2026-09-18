@@ -357,3 +357,23 @@ Q/A for Prompt 78:
 Your Shopify test store has no products yet. How do you want to get one there for testing the import feature?
 
 Add 2 sample products for me to Shopify
+
+Prompt No 79
+Do we use Shopify API or not? If not, then advise me how to setup and get Shopify API key/token for this
+
+Prompt No 80
+what scopes should I assign for this API token I gonna create
+
+Prompt No 81
+I created an app, but do not see API credentials. Just Credentials, where Client ID and Secret presented
+
+Prompt No 82
+Seems like to get token we need use client ID and secret to request it with API first
+
+Prompt No 83
+I have no "Apps and sales channels" in Shopify settings. Can you review newest documentation of Shopify probably
+
+Q/A for Prompt 83:
+Given the token now expires every ~24h, how do you want to handle it?
+
+Implement the client-credentials flow in the app
