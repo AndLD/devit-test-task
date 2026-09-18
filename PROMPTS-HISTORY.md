@@ -422,3 +422,11 @@ Try again
 
 ## Prompt No 94
 Verify PROMPTS-HISTORY is synchronised with our chat history
+
+## Prompt No 95
+I guess Try again prompt was not at 93 position. It was earlier, check again
+
+### Q/A for Prompt 95
+Where in the prompt sequence did the "Try again" message actually occur?
+
+"Try again" prompt occur after this prompt: "Okay, then replace fetch with axios also for backend node.js side (and define it as instruction to AGENTS.md)"
