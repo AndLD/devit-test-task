@@ -454,3 +454,11 @@ Verify setup instructions in README. Is it valid? I see docker compose up is sug
 
 ## Prompt No 102
 Verify all docs consistency. Also verify all project requirements are covered
+
+## Prompt No 103
+Merge develop branch to main branch and make repository public instead of private.
+
+### Q/A for Prompt 103
+AI-WORKLOG.md references your real trial Shopify store domain (id111w-aj.myshopify.com). Redact it before going public?
+
+Yes, redact it
