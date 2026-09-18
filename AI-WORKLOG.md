@@ -451,4 +451,14 @@ One bug in the tests themselves was caught this way too: an integration test ass
 - **Verification:** `grep -rln "id111w-aj"` across all tracked doc/code files came back empty after the edit (the working tree no longer contains the real domain anywhere).
 - **Reference:** [AI-WORKLOG.md](AI-WORKLOG.md)
 
+### 2026-09-18 — Verify AI-WORKLOG-SUMMARY.md sync, link every doc file from README.md
+
+- **Task:** The user asked to (1) re-verify AI-WORKLOG-SUMMARY.md is still synchronized with the full AI-WORKLOG.md, and (2) link AI-WORKLOG-SUMMARY.md, PROJECT-REQUIREMENTS.md, and PROMPTS-HISTORY.md from README.md, so every doc file in the repo is discoverable from the main entry point.
+- **AI contribution:**
+  - Cross-checked all three of AI-WORKLOG-SUMMARY.md's "notable decision" write-ups against their source entries in AI-WORKLOG.md line by line: the `requireAdminId()` refactor's cited test counts ("39 unit + 16 integration tests then") match the source entry's own verification line exactly; the 404-status bug and Jest-ESM decisions' descriptions match their source entries' root-cause explanations and fixes. Confirmed the "Role of automated tests" section's two cited bugs and the `toBeInstanceOf(Array)` test-bug story match AI-WORKLOG.md's own dedicated section word-for-word in substance. No new drift found beyond the test-count staleness already fixed in the previous sync pass — this pass exists specifically to confirm that fix actually held and nothing else had drifted since.
+  - Added a "Related documentation" section right after README's intro paragraph, listing all seven project doc files (PROJECT-REQUIREMENTS.md, DEVELOPMENT-PLAN.md, AGENTS.md, AI-WORKLOG.md, AI-WORKLOG-SUMMARY.md, PROMPTS-HISTORY.md, CODE-QUALITY-REVIEW.md) with a one-line description each, verified with a small script that every link resolves to a real file. Also converted three existing bare-text mentions of PROJECT-REQUIREMENTS.md and AI-WORKLOG-SUMMARY.md elsewhere in README into proper markdown links, rather than leaving the new index section as the only place they're clickable.
+- **My contribution:** Asked for the re-verification and the doc-discoverability fix as a pair, right after the repo went public.
+- **Verification:** Read every referenced line pair (summary vs. full log) directly rather than trusting the previous sync entry's conclusion; re-ran the file-link-resolution script from the earlier consistency pass against the updated README.md — all links resolve, including the three newly added ones.
+- **Reference:** [README.md](README.md) (Related documentation section), [AI-WORKLOG-SUMMARY.md](AI-WORKLOG-SUMMARY.md)
+
 <!-- Further entries appended below as implementation proceeds. -->

@@ -4,6 +4,16 @@
 
 A small product-card editor for an online store: managers edit description/SEO fields and publish product cards in a private admin panel; visitors browse a public catalog of published products.
 
+## Related documentation
+
+- [PROJECT-REQUIREMENTS.md](PROJECT-REQUIREMENTS.md) — the original task spec (Ukrainian).
+- [DEVELOPMENT-PLAN.md](DEVELOPMENT-PLAN.md) — the approved phase-by-phase implementation plan.
+- [AGENTS.md](AGENTS.md) — strategic/technical decisions, and the Git Flow, logging, and documentation policies every AI agent working in this repo follows.
+- [AI-WORKLOG.md](AI-WORKLOG.md) — the full, chronological log of AI tool usage: every phase, fix, and verification step.
+- [AI-WORKLOG-SUMMARY.md](AI-WORKLOG-SUMMARY.md) — a short version of the above, covering just what the task requirements ask for.
+- [PROMPTS-HISTORY.md](PROMPTS-HISTORY.md) — a verbatim, append-only log of every prompt sent to the AI agent throughout the project.
+- [CODE-QUALITY-REVIEW.md](CODE-QUALITY-REVIEW.md) — a SOLID/coupling/testability/test-coverage self-assessment of the codebase.
+
 ## Tech stack
 
 - **Framework:** Next.js (App Router), TypeScript
@@ -167,7 +177,7 @@ A "Suggest with AI" button on the product editor (`ProductEditorForm`) generates
 An "Import from Shopify" form on the admin product list (`ShopifyImportForm`) fetches one product from a Shopify store's Admin API by product ID and creates it in this app's own database as a **draft**, ready for review before publishing — the one deliberate exception to "the admin editor never creates products" (see AGENTS.md). It maps:
 
 - Shopify's `title` → this app's `name`; `handle` → `slug` (Shopify handles are already URL-safe; a numeric suffix is appended on a collision with an existing product).
-- `body_html`, stripped of HTML tags → `description` (this app never stores/renders raw HTML — see PROJECT-REQUIREMENTS.md's "product content must never execute as third-party code").
+- `body_html`, stripped of HTML tags → `description` (this app never stores/renders raw HTML — see [PROJECT-REQUIREMENTS.md](PROJECT-REQUIREMENTS.md)'s "product content must never execute as third-party code").
 - `vendor`, `product_type`, and product-level `options` (e.g. "Color: Black, White") → `characteristics`.
 - `seoTitle`/`seoDescription` are derived from the title/description, since Shopify's default product resource doesn't expose this app's separate SEO fields.
 
@@ -178,7 +188,7 @@ Every field is re-validated against the same limits as a manual save before the 
 - `SHOPIFY_CLIENT_ID` + `SHOPIFY_CLIENT_SECRET` — the current path for any app created after 2026-01-01, when Shopify moved custom-app creation to the [Dev Dashboard](https://dev.shopify.com/dashboard/) and dropped the old directly-revealed static token. The app itself exchanges these for a short-lived (~24h) access token and refreshes it automatically (`ClientCredentialsTokenProvider`, `src/server/services/shopify/token-provider.ts`) — no manual token refresh needed. To get these: create an app in the Dev Dashboard, add the `read_products` scope, **install the app on your store** (a separate step from creating it — skipping it produces an `app_not_installed` error), then copy the Client ID/Secret from the app's Settings.
 - `SHOPIFY_ADMIN_API_TOKEN` — a static token, only available if you have a "legacy" custom app created before that date (`StaticTokenProvider`).
 
-Without either configured, the import form shows a plain "not configured" error (503) rather than crashing; there's no mock mode for this bonus (PROJECT-REQUIREMENTS.md doesn't ask for one here, unlike the LLM integration).
+Without either configured, the import form shows a plain "not configured" error (503) rather than crashing; there's no mock mode for this bonus ([PROJECT-REQUIREMENTS.md](PROJECT-REQUIREMENTS.md) doesn't ask for one here, unlike the LLM integration).
 
 **Verified live, end to end:** the real Admin API call (`ShopifyAdminApiClient`, `src/server/services/shopify/shopify-client.ts`) was exercised against a real Shopify trial store created for this purpose — two products were added there (via a connected Shopify MCP tool), a Dev Dashboard app was set up with the client-credentials flow above, and importing one of those products through the running app's own UI produced a correctly-mapped draft product (HTML description cleaned to plain text, options mapped to characteristics, SEO fields derived) via a real network round trip, not a fake. `tests/unit/shopify-mapper.test.ts` and `tests/integration/admin-import.test.ts` use that same product's real fetched data (including its actual HTML) as their fixture, so the mapping logic is verified against genuine Shopify output both in the live run and in the automated suite. `ShopifyAdminApiClient`'s own REST-response mapping and error handling (404, other non-2xx, malformed body, network failure) and `resolveShopifyClient()`'s auth-method selection are unit-tested against a fake HTTP client in `tests/unit/shopify-client.test.ts`.
 
@@ -241,7 +251,7 @@ This is very slightly (~9 minutes) over the 6–8h target in AGENTS.md — the w
 
 | Activity                                                                 | Time         |
 | ------------------------------------------------------------------------- | ------------ |
-| Phase 6 — finalize README.md/AI-WORKLOG.md, requirements-compliance review, AI-WORKLOG-SUMMARY.md | 1h15m09s     |
+| Phase 6 — finalize README.md/AI-WORKLOG.md, requirements-compliance review, [AI-WORKLOG-SUMMARY.md](AI-WORKLOG-SUMMARY.md) | 1h15m09s     |
 | Docs fixes made alongside later bonus/polish work (md-doc corrections, disclosing the Figma/bonus-UI scope gap) | 38m42s       |
 | **Docs total**                                                             | **1h53m51s** |
 
