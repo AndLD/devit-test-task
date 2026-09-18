@@ -1,4 +1,8 @@
-Prompt No 1
+# Prompts History
+
+A running, append-only record of the user's own instructions to the AI agent throughout this project. See [AGENTS.md](AGENTS.md#logging-to-prompts-historymd) for the logging policy.
+
+## Prompt No 1
 Look, I am starting to do a test task for getting Fullstack position. See the task requirements in PROJECT-REQUIREMENTS.md file. Our goal is to do all the nested tasks (including the bonus ones).
 
 Now we just planning the flow and the order of implementation. No implementations yet. Lets just make a plan first.
@@ -13,7 +17,7 @@ Also AGENTS.md should include instruction on how to log to AI-WORKLOG.md.
 
 So, introduce initial versions of AGENTS.md file, AI-WORKLOG.md file and README.md file (initial version for README.md may include some placeholders so it should kind of skeleton of future production-ready README file according to the requirements). And provide a development plan here and wait for my approvement.
 
-Q/A for Prompt 1:
+### Q/A for Prompt 1
 Given the 6-8h core time budget plus 4 bonus tasks (LLM integration, Shopify import, Design Tools, Infrastructure), how should we prioritize? All are non-trivial additions.
 
 Bonus tasks are not included into the given time budget 6-8h, so 6-8 is for core, and bonus tasks takes its own bonus time (not defined by the interviewer, but lets consider it like 2-3h).
@@ -35,52 +39,52 @@ For the 'Design Tools' bonus (full Figma/Stitch design transferred to code via A
 
 We will need to implement design (shadcn/ui based UI design) in Figma using Claude Design
 
-Prompt No 2
+## Prompt No 2
 I agree with the plan. Write this plan into separated file DEVELOPMENT-PLAN.md
 
-Prompt No 3
+## Prompt No 3
 Adjust the plan to include Access+Refresh tokens pattern into JWT auth implementation
 
-Prompt No 4
+## Prompt No 4
 Execute Phase 1
 
-Prompt No 5
+## Prompt No 5
 Commit the working tree changes with a sensible message.
 
-Prompt No 6
+## Prompt No 6
 Explain me why do we store refresh tokens to DB? Is it kind of sessions?
 
-Prompt No 7
+## Prompt No 7
 Please adjust the AGENTS.md or where it is more appropriate to do to make future committing changes align with Git Flow. Every development phase should be locked in separated branch. After it is completed, you make PR to main (or to "development" it would be better, lets keep main as for production, and make a diff branch for development)
 
-Prompt No 8
+## Prompt No 8
 I am facing this problem: "andrey@Andriis-Laptop devit-test-task % gh auth login
 zsh: command not found: gh"
 
-Prompt No 9
+## Prompt No 9
 can you install gh yourself
 
-Prompt No 10
+## Prompt No 10
 Did
 
-Prompt No 12
+## Prompt No 12
 Please take into account not to include phase number mentions in branch names. it looks not scalable. You can add a sentence on this as additional instruction near Git Flow instruction
 
-Prompt No 13
+## Prompt No 13
 Please look at PROMPTS-HISTORY.txt
 
 I want you to include as instruction at AGENTS.md: record all user prompts (not your loop engineering prompts, but only my own messages) to PROMPTS-HISTORY.txt
 
-Prompt No 14
+## Prompt No 14
 Execute Phase 2
 
-Prompt No 15
+## Prompt No 15
 Merge the PR please
 
-Prompt No 16
+## Prompt No 16
 For future: do not delete feature branches. Add it as instruction to AGENTS.md
 
-Prompt No 17
+## Prompt No 17
 Before we continue to Phase 3. I want to ask you:
 
 * I recently connected Figma MCP for you. Can you create page and draw directly on my Figma account now?
@@ -90,94 +94,94 @@ Before we continue to Phase 3. I want to ask you:
 
 Do not generate UI yet. We just planning and evaluating
 
-Prompt No 18
+## Prompt No 18
 I want you to draw on Figma directly. Lets not take all 14 screens in one job. I want to see how it works generally and the final quality, so lets choose 1 screen to be implemented (so regular + main states, desktop + mobile). What screen can you suggest to take as first?
 
-Prompt No 19
+## Prompt No 19
 How much time it can take?
 
-Prompt No 20
+## Prompt No 20
 I want to see some result in few minutes max. So, lets change our plan for first screen. Generate just 1 web screen with no additional states.
 
-Prompt No 21
+## Prompt No 21
 Now generate mobile screen for the Admin login
 
-Prompt No 22
+## Prompt No 22
 Now introduce validation error state for both desktop and mobile screens
 
-Prompt No 23
+## Prompt No 23
 I guess you missed recording my prompts to PROMPTS-HISTORY.txt. Check it out
 
-Prompt No 24
+## Prompt No 24
 Question: what the key diff between Admin product list and Public catalog except admin can view draft products and no in public?
 
-Prompt No 25
+## Prompt No 25
 Okay. Then draw desktop and mobile screen for Admin product list
 
-Prompt No 26
+## Prompt No 26
 Regarding desktop view of Admin products list, these long clickable rows look owful. Can you make shorter the width of products list items and keep list centered
 
-Prompt No 27
+## Prompt No 27
 Okay, now draw default state for desktop and mobile of Admin product editor
 
-Prompt No 28
+## Prompt No 28
 I think we can not wait till the Figma MCP reset or upgrade subscription. I want to export code of the screens we have created already and implement UI for them (the rest of the pages we will implement). How can I export the code from Figma?
 
-Prompt No 29
+## Prompt No 29
 How you suggest to resolve missing-slug gap
 
-Prompt No 30
+## Prompt No 30
 Option B looks good. But what we would need to introduce some more public fields later on. It will make us add new fields twice. I do not ask to add new fields now. But how we can prevent such a problem?
 
-Prompt No 31
+## Prompt No 31
 Yes, implement it
 
-Prompt No 32
+## Prompt No 32
 I want to test myself. Give me a workable link to admin products list
 
-Prompt No 33
+## Prompt No 33
 Please fix the font. It should align with the UI design we made
 
-Prompt No 34
+## Prompt No 34
 How you think: we completed UI for admin side or anything left to do by the plan?
 
-Prompt No 35
+## Prompt No 35
 Connect refresh endpoint. And add some spinner for loading (from shadcn probably)
 
-Prompt No 36
+## Prompt No 36
 My bad: I forgot to highlight that I want to use Axios instead of native fetch for all requests from client-side. Record it into tech stack please. And refactor all API requests on client side to turn fetch into axios
 
-Prompt No 37
+## Prompt No 37
 Did we complete all required functionality for Admin side?
 
-Prompt No 38
+## Prompt No 38
 /compact
 
-Prompt No 39
+## Prompt No 39
 Lets continue Phase 4: we already implemented Admin side. Now we need to implement Public side pages
 
-Prompt No 40
+## Prompt No 40
 I found that login page is still available even when admin already authorized. It is not correct
 
-Prompt No 41
+## Prompt No 41
 Did we complete all required functionality for Public side?
 
-Prompt No 42
+## Prompt No 42
 Merge the PR
 
-Prompt No 43
+## Prompt No 43
 I adjusted PROMPTS-HISTORY.txt. Verify and commit
 
-Prompt No 44
+## Prompt No 44
 Merge PR
 
-Prompt No 45
+## Prompt No 45
 Execute Phase 5
 
-Prompt No 46
+## Prompt No 46
 Sync PROMPTS-HISTORY.txt
 
-Prompt No 47
+## Prompt No 47
 What I do wrong?
 
 ```andrey@Andriis-Laptop devit-test-task % npm test
@@ -200,7 +204,7 @@ Error: Cannot find package 'ts-node' imported from /Users/andrey/Documents/TestT
     at async Object.run (/Users/andrey/Documents/TestTaskProjects/devit-test-task/node_modules/jest-cli/build/index.js:665:9)
 andrey@Andriis-Laptop devit-test-task % ```
 
-Prompt No 48
+## Prompt No 48
 Resolve the issue\
 
 ```andrey@Andriis-Laptop devit-test-task % npm test
@@ -234,15 +238,15 @@ Watchman:  watchman --no-pretty get-sockname returned with exit code=null, signa
   Referenced from: <141A04D3-90F0-393A-AF51-5279D0FDA4D7> /opt/homebrew/Cellar/watchman/2024.11.25.00/bin/watchman
   Expected in:     <35A81A20-F4AF-3A41-99D7-8EB9CAD68842> /opt/homebrew/Cellar/fbthrift/2025.06.30.00/lib/libasync.1.0.0.dylib```
 
-Prompt No 49
+## Prompt No 49
 seems like you made tests only for Backend side? Or I am wrong?
 
-Prompt No 50
+## Prompt No 50
 I want you to create unit/integration tests for Frontend. And also make e2e tests with cypress to cover all core user flows (for both admin/public side).
 
 Adjust the Phase 5 in plan to include this as well
 
-Prompt No 51
+## Prompt No 51
 I did "npm run dev" and "npm run test:e2e" and get this:
 ```andrey@Andriis-Laptop devit-test-task % npm run test:e2e
 
@@ -265,138 +269,141 @@ Instead change the require of index.js in /Users/andrey/Documents/TestTaskProjec
 
 Node.js v20.14.0```
 
-Prompt No 52
+## Prompt No 52
 Wait, can you please temporaly disable node version check you just added
 
-Prompt No 53
+## Prompt No 53
 I found that right now if I run "npm run test:e2e" it fails with ESM problem (as before), but if I run "nvm use && npm run test:e2e", it works okay. Why?
 
-Prompt No 54
+## Prompt No 54
 But why next project run fine, but e2e tests fails with ESM
 
-Prompt No 55
+## Prompt No 55
 wait, you want to say seed would not work the same as the e2e tests?
 
-Prompt No 56
+## Prompt No 56
 what is better: to use version checker or to add "nvm use" just in seed script?
 
-Prompt No 57
+## Prompt No 57
 but version checker not lets me use any version to just run next app
 
-Prompt No 58
+## Prompt No 58
 what "nvm use" without specifying version as argument? It takes version from nvmrc?
 
-Prompt No 59
+## Prompt No 59
 Merge the PR
 
-Prompt No 60
+## Prompt No 60
 Execute Phase 6
 
-Prompt No 61
+## Prompt No 61
 @"/Users/andrey/Downloads/Clockify_Time_Report_Summary_14_09_2026-20_09_2026.pdf"
 9.5h it is wrong assumption, because I did breaks. Here I exported PDF report from Clockify where I tracked time logs attentively. Please review the report doc and extract correct time taken for each phase
 
-Prompt No 62
+## Prompt No 62
 Review AI-WORKLOG in context of dates of entries. There is a mix of 09-16/09-17. Resolve this. Do not commit without my approve
 
-Prompt No 63
+## Prompt No 63
 Please compare entries in AI-WORKLOG against the Clockify PDF report. Planning was started on 09-14 and 09-15, then completed 09-16. Then Phase 1 and Phase 2 also were completed on 09-16 the rest is 09-17.
 Verify my time memories against the the PDF report
 
-Prompt No 64
+## Prompt No 64
 Yes
 
-Prompt No 65
+## Prompt No 65
 Now  evaluate the whole project (core functionality) implemented against project requirements file.
 
-Prompt No 66
+## Prompt No 66
 But wait, we should highlight that 8h 42h includes time for the partial Design generation which is marked as bonus task in requriements actually
 
-Prompt No 67
+## Prompt No 67
 Do we have AI auto tests evaluation on our md files as it is requested in the project requirements?
 
-Prompt No 68
+## Prompt No 68
 where "Quality assessment of the AI-written tests themselves" located? If it is placed only in entries, we need it to be more noticable
 
-Prompt No 69
+## Prompt No 69
 Project requirements includes this: "2–3 конкретні приклади рішень щодо AI-коду з поясненням вибору й результатів перевірки; підтвердження — короткі фрагменти роботи або посилання на відповідні зміни в репозиторії."
 
 Do not you think our AI-WORKLOG is too long/broad?
 
 Do not change AI-WORKLOG, let's just discuss
 
-Prompt No 70
+## Prompt No 70
 how do you think, maybe we need make two files: one is full and one with key highlights? Do not implement, just discuss
 
-Prompt No 71
+## Prompt No 71
 I just know that even technician reviewer will not review such a long file
 
-Prompt No 72
+## Prompt No 72
 Make additional file AI-WORKLOG-SUMMARY.md.
 Do not commit, wait for approve
 
-Prompt No 73
+## Prompt No 73
 Sync PROMPTS-HISTORY.txt
 
-Prompt No 74
+## Prompt No 74
 Project requirements have a requirement to provide a url to the design. So include a url to our partial UI design: https://www.figma.com/design/XEWl5YinPePK2aQajd9xE3/Product-Content-Studio-%E2%80%94-UI-Design?node-id=0-1&t=u1ntu3s3m0f4qGVE-1
 
-Prompt No 75
+## Prompt No 75
 Commit and merge the PR
 
-Prompt No 76
+## Prompt No 76
 Execute Phase 7 infrastructure point (DEVELOPMENT-PLAN.md)
 
-Prompt No 77
+## Prompt No 77
 Execute Phase 7 LLM point
 
-Prompt No 78
+## Prompt No 78
 Execute Phase 7 Shopify point
 
-Q/A for Prompt 78:
+### Q/A for Prompt 78
 Your Shopify test store has no products yet. How do you want to get one there for testing the import feature?
 
 Add 2 sample products for me to Shopify
 
-Prompt No 79
+## Prompt No 79
 Do we use Shopify API or not? If not, then advise me how to setup and get Shopify API key/token for this
 
-Prompt No 80
+## Prompt No 80
 what scopes should I assign for this API token I gonna create
 
-Prompt No 81
+## Prompt No 81
 I created an app, but do not see API credentials. Just Credentials, where Client ID and Secret presented
 
-Prompt No 82
+## Prompt No 82
 Seems like to get token we need use client ID and secret to request it with API first
 
-Prompt No 83
+## Prompt No 83
 I have no "Apps and sales channels" in Shopify settings. Can you review newest documentation of Shopify probably
 
-Q/A for Prompt 83:
+### Q/A for Prompt 83
 Given the token now expires every ~24h, how do you want to handle it?
 
 Implement the client-credentials flow in the app
 
-Prompt No 84
+## Prompt No 84
 Replace fetch browser requests with axios
 
-Prompt No 85
+## Prompt No 85
 Okay, then replace fetch with axios also for backend node.js side (and define it as instruction to AGENTS.md)
 
-Prompt No 86
+## Prompt No 86
 Fix header title on Admin header: instead "Products" write project title to match the UI design.
 Also check how admin header looks like in the Figma design. In code it currently have width limitation the same as products list width limitation, while header should not included to width limitation according to the design.
 
-Prompt No 87
+## Prompt No 87
 Check if we highlighted that the UI design on Figma not includes bonus features like LLM and Shopify tasks.
 
-Prompt No 88
+## Prompt No 88
 Yes
 
-Prompt No 89
+## Prompt No 89
 @"/Users/andrey/Downloads/Clockify_Time_Report_Summary_14_09_2026-20_09_2026 (1).pdf"
 See the updated time report from Clockify. Fix entries dates (some 09-17 should be 09-18) and write down time taken by docs and bonus features
 
-Prompt No 90
+## Prompt No 90
 Add instruction to AGENTS.md: do not wait for CI checks if you just updating docs.
+
+## Prompt No 91
+Turn PROMPTS-HISTORY into md also

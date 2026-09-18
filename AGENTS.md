@@ -74,17 +74,17 @@ This repo follows a lightweight Git Flow. Any AI coding agent making commits mus
 - **Phase/feature branches** — one branch per development phase (or bonus task), branched from `develop`, named after what the branch does (e.g. `backend-core`, `design-system`, `bonus-llm-integration`), not after its phase number. All commits for that phase land here.
   - Don't encode the [DEVELOPMENT-PLAN.md](DEVELOPMENT-PLAN.md) phase number in the branch name (no `phase-2-*`) — phase numbering is a planning artifact that can be reordered or split, while branch names should stay meaningful and scalable (e.g. surviving a rebase of the plan) on their own.
 - **Pull requests** — when a phase branch is complete (builds, lints, and its tests pass), open a PR into `develop`, not `main`. Merge `develop` into `main` only at a release milestone, via its own PR.
-  - **CI checks** — wait for `gh pr checks --watch` to confirm all jobs pass before merging any PR that touches code (application, tests, config, CI workflow itself, etc.). **Exception:** a docs-only PR (only `.md` files — README.md, AGENTS.md, AI-WORKLOG.md, PROMPTS-HISTORY.txt, etc. — no source, test, or config changes) can be merged right after opening it, without waiting for CI, since none of the CI jobs exercise doc content.
+  - **CI checks** — wait for `gh pr checks --watch` to confirm all jobs pass before merging any PR that touches code (application, tests, config, CI workflow itself, etc.). **Exception:** a docs-only PR (only `.md` files — README.md, AGENTS.md, AI-WORKLOG.md, PROMPTS-HISTORY.md, etc. — no source, test, or config changes) can be merged right after opening it, without waiting for CI, since none of the CI jobs exercise doc content.
 - Keep phase branches scoped to their phase — don't bundle unrelated phases into one branch/PR, so review and AI-WORKLOG entries map cleanly to what shipped.
 - **Do not delete feature/phase branches after merging** (neither locally nor on the remote) — pass `--delete-branch=false` / omit branch deletion when merging a PR (e.g. `gh pr merge --merge`, not `--merge --delete-branch`). Keep the merged history browsable per phase.
 
-## Logging to PROMPTS-HISTORY.txt
+## Logging to PROMPTS-HISTORY.md
 
-[PROMPTS-HISTORY.txt](PROMPTS-HISTORY.txt) is a running record of the user's own instructions to the AI agent throughout this project — kept separate from AI-WORKLOG.md, which records what the AI/candidate _did_, not what was _asked_. Every AI coding agent working in this repo must:
+[PROMPTS-HISTORY.md](PROMPTS-HISTORY.md) is a running record of the user's own instructions to the AI agent throughout this project — kept separate from AI-WORKLOG.md, which records what the AI/candidate _did_, not what was _asked_. Every AI coding agent working in this repo must:
 
-- Append each new message the user sends directly to the agent (chat instructions to Claude Code or any other AI tool used on this project), verbatim, as its own `Prompt No <n>` entry (incrementing from the last one in the file).
+- Append each new message the user sends directly to the agent (chat instructions to Claude Code or any other AI tool used on this project), verbatim, as its own `## Prompt No <n>` markdown heading (incrementing from the last one in the file).
 - Only log the user's own words. Never log the agent's internal/system prompts, tool outputs, clarifying-question UI text, or its own responses.
-- When the agent asked clarifying questions and the user answered them (e.g. via a question/answer flow), append the question and the user's answer text under the same prompt entry (see the existing `Q/A for Prompt N` entries in the file for the format), since that answer is still the user's own input.
+- When the agent asked clarifying questions and the user answered them (e.g. via a question/answer flow), append the question and the user's answer text under a `### Q/A for Prompt N` sub-heading beneath that same prompt entry (see the existing entries in the file for the format), since that answer is still the user's own input.
 - Append-only — never edit or renumber past entries.
 
 ## Logging to AI-WORKLOG.md
