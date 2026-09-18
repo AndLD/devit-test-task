@@ -233,20 +233,21 @@ Full principles in [AGENTS.md](AGENTS.md).
 
 ## Time spent
 
-Tracked attentively in Clockify (not estimated from commit timestamps — an earlier draft of this section did that and undercounted real elapsed time, since it couldn't see breaks between work sessions). Figures below are from Clockify's full report covering the whole project (14–20 Sep 2026, total **13h46m42s**), superseding an earlier draft that only covered a partial export (through Phase 5, 8h41m47s). Per-phase durations are exact where a logged time entry maps to a single activity; where one entry spans multiple named activities (e.g. "Execute Phase 4 + Fix missing-slug + ... + Execute Phase 5"), its duration is split evenly across the number of activities named, since Clockify's summary export doesn't sub-divide a single tracked entry any further. All figures below were verified to sum back to the report's own total.
+Tracked attentively in Clockify (not estimated from commit timestamps — an earlier draft of this section did that and undercounted real elapsed time, since it couldn't see breaks between work sessions). Figures below are from Clockify's latest full report covering the whole project (14–20 Sep 2026, total **16h39m28s**), superseding an earlier full report (13h46m42s) that predates the LLM/Shopify test-coverage work, the codebase-quality review, the manual testing guide, and the from-scratch setup verification. Per-phase durations are exact where a logged time entry maps to a single activity; where one entry spans multiple named activities (e.g. "Execute Phase 4 + Fix missing-slug + ... + Execute Phase 5"), its duration is split evenly across the number of activities named, since Clockify's summary export doesn't sub-divide a single tracked entry any further. All figures below were verified to sum back to the report's own total.
 
 **Core budget (target: 6–8h):**
 
 | Phase                                                    | Time         |
 | --------------------------------------------------------- | ------------ |
-| Planning & AI harness setup (AGENTS.md/DEVELOPMENT-PLAN.md/AI-WORKLOG.md, Git Flow policy, harness corrections) | 3h26m45s     |
+| Planning & AI harness setup (AGENTS.md/DEVELOPMENT-PLAN.md/AI-WORKLOG.md, Git Flow policy, harness corrections) | 3h56m25s     |
 | Phase 1 — scaffolding                                      | 53m43s       |
 | Phase 2 — backend core (JWT auth, product APIs, seed)       | 33m55s       |
 | Phase 4 — UI implementation (admin + public) + the missing-slug fix, token-refresh wiring, and axios migration done along the way | 1h17m54s     |
 | Phase 5 — automated tests (backend + frontend + Cypress e2e) and the Node-version/ESM tooling fixes | 1h56m42s     |
-| **Core total**                                             | **8h08m59s** |
+| Post-launch code-quality maintenance ([PRODUCT_CONTENT_LIMITS](src/lib/validation/product-limits.ts) refactor + small fixes) | 22m49s       |
+| **Core total**                                             | **9h01m28s** |
 
-This is very slightly (~9 minutes) over the 6–8h target in AGENTS.md — the whole overage is a single "Planning final steps" entry (27m55s) that wasn't captured in the earlier partial export; the practical scope of core work didn't change between drafts.
+This runs about an hour over the 6–8h target in AGENTS.md — not from the original Phases 1/2/4/5 growing (those figures are unchanged from the prior report), but from planning/maintenance time logged after the core phases were already done: a "Planning" slice bundled into two later mixed-activity entries, and a small post-launch refactor's non-docs portion. Both are disclosed here rather than folded silently into the bonus/docs budgets where they'd be less visible.
 
 **Docs budget (Phase 6 + ongoing docs maintenance, not a phase with its own time target in AGENTS.md):**
 
@@ -254,22 +255,23 @@ This is very slightly (~9 minutes) over the 6–8h target in AGENTS.md — the w
 | ------------------------------------------------------------------------- | ------------ |
 | Phase 6 — finalize README.md/AI-WORKLOG.md, requirements-compliance review, [AI-WORKLOG-SUMMARY.md](AI-WORKLOG-SUMMARY.md) | 1h15m09s     |
 | Docs fixes made alongside later bonus/polish work (md-doc corrections, disclosing the Figma/bonus-UI scope gap) | 38m42s       |
-| **Docs total**                                                             | **1h53m51s** |
+| Later docs work (CI-skip policy, [PROMPTS-HISTORY.md](PROMPTS-HISTORY.md) conversion + sync fixes, [CODE-QUALITY-REVIEW.md](CODE-QUALITY-REVIEW.md), test-count table, Getting-started fix, [MANUAL-TESTING-GUIDE.md](MANUAL-TESTING-GUIDE.md), doc-linking, time report updates) | 1h29m00s     |
+| **Docs total**                                                             | **3h22m51s** |
 
 **Bonus budget (separate target: ~2–3h, not counted against the core budget above):**
 
 | Bonus                                                                          | Time         |
 | --------------------------------------------------------------------------------- | ------------ |
 | Design Tools (Phase 3 Figma design via MCP, plus the later admin-header fix to match it) | 1h10m04s     |
-| LLM integration (OpenAI)                                                       | 39m07s       |
-| Shopify import                                                                 | 1h09m18s     |
-| Infrastructure (Docker Compose full-stack + CI)                               | 9m47s        |
+| LLM integration (OpenAI, incl. later unit-test coverage work)                  | 49m41s       |
+| Shopify import (incl. later unit-test coverage work)                          | 1h19m51s     |
+| Infrastructure (Docker Compose full-stack + CI, incl. later from-scratch verification) | 19m57s       |
 | Cross-cutting: backend axios migration (benefits both the LLM and Shopify integrations) | 35m36s       |
-| **Bonus total**                                                                | **3h43m52s** |
+| **Bonus total**                                                                | **4h15m09s** |
 
-The bonus total runs noticeably over the ~2–3h allotment in AGENTS.md, mainly because all four bonus tasks were attempted (the plan only committed to attempting them, not to finishing all four within budget) and because the Shopify integration needed a second, unplanned pass when Shopify deprecated its legacy static-token auth flow mid-project (see "Shopify auth updated for the new Dev Dashboard flow" in [AI-WORKLOG.md](AI-WORKLOG.md)). Design Tools' own time also grew slightly after the Figma mockups were revisited to fix the admin header.
+The bonus total runs noticeably over the ~2–3h allotment in AGENTS.md, mainly because all four bonus tasks were attempted (the plan only committed to attempting them, not to finishing all four within budget) and because the Shopify integration needed a second, unplanned pass when Shopify deprecated its legacy static-token auth flow mid-project (see "Shopify auth updated for the new Dev Dashboard flow" in [AI-WORKLOG.md](AI-WORKLOG.md)). Design Tools' own time also grew slightly after the Figma mockups were revisited to fix the admin header, and the LLM/Shopify/Infrastructure figures grew further after closing the test-coverage gap identified in [CODE-QUALITY-REVIEW.md](CODE-QUALITY-REVIEW.md) and re-verifying the from-scratch setup flows.
 
-**Grand total (core + docs + bonus): 13h46m42s**, matching the Clockify report's own reported total exactly.
+**Grand total (core + docs + bonus): 16h39m28s**, matching the Clockify report's own reported total exactly.
 
 ## Bonus features
 
