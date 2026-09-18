@@ -1,3 +1,5 @@
+import type { AxiosResponse } from "axios";
+import { httpClient } from "@/server/lib/http-client";
 import type {
   LlmProvider,
   ProductSuggestion,
@@ -37,15 +39,11 @@ export class OpenAiProvider implements LlmProvider {
   ) {}
 
   async generate(input: ProductSuggestionInput): Promise<ProductSuggestion> {
-    let response: Response;
+    let response: AxiosResponse;
     try {
-      response = await fetch(OPENAI_CHAT_COMPLETIONS_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${this.apiKey}`,
-        },
-        body: JSON.stringify({
+      response = await httpClient.post(
+        OPENAI_CHAT_COMPLETIONS_URL,
+        {
           model: this.model,
           response_format: { type: "json_object" },
           temperature: 0.7,
@@ -53,20 +51,20 @@ export class OpenAiProvider implements LlmProvider {
             { role: "system", content: SYSTEM_PROMPT },
             { role: "user", content: buildUserPrompt(input) },
           ],
-        }),
-      });
+        },
+        { headers: { Authorization: `Bearer ${this.apiKey}` } },
+      );
     } catch {
       throw new LlmProviderError("Could not reach the OpenAI API.");
     }
 
-    if (!response.ok) {
+    if (response.status < 200 || response.status >= 300) {
       throw new LlmProviderError(
         `OpenAI API request failed with status ${response.status}.`,
       );
     }
 
-    const payload = await response.json().catch(() => null);
-    const content = payload?.choices?.[0]?.message?.content;
+    const content = response.data?.choices?.[0]?.message?.content;
     if (typeof content !== "string") {
       throw new LlmProviderError("OpenAI API returned an unexpected response shape.");
     }

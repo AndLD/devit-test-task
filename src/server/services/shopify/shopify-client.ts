@@ -1,3 +1,5 @@
+import type { AxiosResponse } from "axios";
+import { httpClient } from "@/server/lib/http-client";
 import {
   ShopifyClientError,
   ShopifyProductNotFoundError,
@@ -37,9 +39,9 @@ export class ShopifyAdminApiClient implements ShopifyClient {
     const url = `https://${this.storeDomain}/admin/api/${API_VERSION}/products/${productId}.json`;
     const accessToken = await this.tokenProvider.getAccessToken();
 
-    let response: Response;
+    let response: AxiosResponse;
     try {
-      response = await fetch(url, {
+      response = await httpClient.get(url, {
         headers: { "X-Shopify-Access-Token": accessToken },
       });
     } catch {
@@ -49,14 +51,13 @@ export class ShopifyAdminApiClient implements ShopifyClient {
     if (response.status === 404) {
       throw new ShopifyProductNotFoundError();
     }
-    if (!response.ok) {
+    if (response.status < 200 || response.status >= 300) {
       throw new ShopifyClientError(
         `Shopify Admin API request failed with status ${response.status}.`,
       );
     }
 
-    const payload = await response.json().catch(() => null);
-    const product: ShopifyRestProduct | undefined = payload?.product;
+    const product: ShopifyRestProduct | undefined = response.data?.product;
     if (!product || typeof product.id !== "number" || typeof product.title !== "string") {
       throw new ShopifyClientError("Shopify Admin API returned an unexpected response shape.");
     }

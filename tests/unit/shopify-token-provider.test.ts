@@ -5,11 +5,11 @@ import {
 } from "@/server/services/shopify/token-provider";
 import { ShopifyClientError } from "@/server/services/shopify/types";
 
-function jsonResponse(body: unknown, status = 200): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { "content-type": "application/json" },
-  });
+// A fake satisfying just the shape ClientCredentialsTokenProvider actually
+// calls (`post`) — same structural-typing approach used for the
+// repository/provider fakes elsewhere in this suite.
+function makeFakeHttpClient(post: (...args: unknown[]) => unknown) {
+  return { post } as never;
 }
 
 describe("StaticTokenProvider", () => {
@@ -21,64 +21,68 @@ describe("StaticTokenProvider", () => {
 });
 
 describe("ClientCredentialsTokenProvider", () => {
-  let fetchSpy: jest.SpiedFunction<typeof fetch>;
-
-  beforeEach(() => {
-    fetchSpy = jest.spyOn(global, "fetch");
-  });
-
-  afterEach(() => {
-    fetchSpy.mockRestore();
-  });
-
   it("exchanges client id/secret for a token via the documented grant", async () => {
-    fetchSpy.mockResolvedValue(
-      jsonResponse({ access_token: "fresh-token", expires_in: 86399 }),
-    );
+    const post = jest.fn(async () => ({
+      status: 200,
+      data: { access_token: "fresh-token", expires_in: 86399 },
+    }));
     const provider = new ClientCredentialsTokenProvider(
       "test-shop.myshopify.com",
       "client-id",
       "client-secret",
+      makeFakeHttpClient(post),
     );
 
     const token = await provider.getAccessToken();
 
     expect(token).toBe("fresh-token");
-    expect(fetchSpy).toHaveBeenCalledWith(
+    expect(post).toHaveBeenCalledWith(
       "https://test-shop.myshopify.com/admin/oauth/access_token",
-      expect.objectContaining({ method: "POST" }),
+      expect.any(URLSearchParams),
+      expect.objectContaining({
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      }),
     );
-    const [, init] = fetchSpy.mock.calls[0];
-    const body = init?.body as URLSearchParams;
+    const [, body] = post.mock.calls[0] as unknown as [string, URLSearchParams];
     expect(body.get("grant_type")).toBe("client_credentials");
     expect(body.get("client_id")).toBe("client-id");
     expect(body.get("client_secret")).toBe("client-secret");
   });
 
   it("caches the token and doesn't re-request while still valid", async () => {
-    fetchSpy.mockResolvedValue(
-      jsonResponse({ access_token: "fresh-token", expires_in: 86399 }),
-    );
+    const post = jest.fn(async () => ({
+      status: 200,
+      data: { access_token: "fresh-token", expires_in: 86399 },
+    }));
     const provider = new ClientCredentialsTokenProvider(
       "test-shop.myshopify.com",
       "client-id",
       "client-secret",
+      makeFakeHttpClient(post),
     );
 
     await provider.getAccessToken();
     await provider.getAccessToken();
 
-    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    expect(post).toHaveBeenCalledTimes(1);
   });
 
   it("re-requests once the cached token is past its expiry", async () => {
-    fetchSpy
-      .mockResolvedValueOnce(jsonResponse({ access_token: "first-token", expires_in: 1 }))
-      .mockResolvedValueOnce(jsonResponse({ access_token: "second-token", expires_in: 86399 }));
+    const post = jest
+      .fn<() => Promise<{ status: number; data: unknown }>>()
+      .mockResolvedValueOnce({
+        status: 200,
+        data: { access_token: "first-token", expires_in: 1 },
+      })
+      .mockResolvedValueOnce({
+        status: 200,
+        data: { access_token: "second-token", expires_in: 86399 },
+      });
     const provider = new ClientCredentialsTokenProvider(
       "test-shop.myshopify.com",
       "client-id",
       "client-secret",
+      makeFakeHttpClient(post as never),
     );
 
     const first = await provider.getAccessToken();
@@ -88,26 +92,30 @@ describe("ClientCredentialsTokenProvider", () => {
 
     expect(first).toBe("first-token");
     expect(second).toBe("second-token");
-    expect(fetchSpy).toHaveBeenCalledTimes(2);
+    expect(post).toHaveBeenCalledTimes(2);
   });
 
   it("throws ShopifyClientError when the exchange fails", async () => {
-    fetchSpy.mockResolvedValue(jsonResponse({ error: "invalid_client" }, 401));
+    const post = jest.fn(async () => ({ status: 401, data: { error: "invalid_client" } }));
     const provider = new ClientCredentialsTokenProvider(
       "test-shop.myshopify.com",
       "client-id",
       "wrong-secret",
+      makeFakeHttpClient(post),
     );
 
     await expect(provider.getAccessToken()).rejects.toBeInstanceOf(ShopifyClientError);
   });
 
   it("throws ShopifyClientError on a network failure", async () => {
-    fetchSpy.mockRejectedValue(new Error("network down"));
+    const post = jest.fn(async () => {
+      throw new Error("network down");
+    });
     const provider = new ClientCredentialsTokenProvider(
       "test-shop.myshopify.com",
       "client-id",
       "client-secret",
+      makeFakeHttpClient(post),
     );
 
     await expect(provider.getAccessToken()).rejects.toBeInstanceOf(ShopifyClientError);
