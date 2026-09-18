@@ -445,3 +445,9 @@ Add more unit/integration tests for LLM and Shopify to cover the relative test c
 
 ## Prompt No 99
 Should not we write count of auto tests per chapter and general one to docs?
+
+## Prompt No 100
+Why do we have jest.config.js as js and not ts file? Should not we make it ts as well?
+
+## Prompt No 101
+Verify setup instructions in README. Is it valid? I see docker compose up is suggested for getting ready just PostgreSQL locally, but I guess it also run next production, no?
