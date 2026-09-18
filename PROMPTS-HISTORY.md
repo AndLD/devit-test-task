@@ -465,3 +465,6 @@ Yes, redact it
 
 ## Prompt No 104
 Verify AI-WORKLOG-SUMMARY and AI-WORKLOG are synchronized. And also link AI-WORKLOG-SUMMARY, PROJECT-REQUIREMENTS and PROMPTS-HISTORY to README (so every doc file is mentioned on the main doc entry file, which is README).
+
+## Prompt No 105
+Provide manual testing instruction for checking the core user flows and write this to a separated md file linked to README. (so reviewer and I and any other people can follow these steps/cases to verify the project is completed fine).
