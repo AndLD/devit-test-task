@@ -184,7 +184,8 @@ Sync PROMPTS-HISTORY.txt
 ## Prompt No 47
 What I do wrong?
 
-```andrey@Andriis-Laptop devit-test-task % npm test
+```
+andrey@Andriis-Laptop devit-test-task % npm test
 
 > product-content-studio@0.1.0 test
 > npm run test:unit && npm run test:integration
@@ -202,12 +203,14 @@ Error: Cannot find package 'ts-node' imported from /Users/andrey/Documents/TestT
     at async readConfigs (/Users/andrey/Documents/TestTaskProjects/devit-test-task/node_modules/jest-config/build/index.js:1211:26)
     at async runCLI (/Users/andrey/Documents/TestTaskProjects/devit-test-task/node_modules/@jest/core/build/index.js:1420:7)
     at async Object.run (/Users/andrey/Documents/TestTaskProjects/devit-test-task/node_modules/jest-cli/build/index.js:665:9)
-andrey@Andriis-Laptop devit-test-task % ```
+andrey@Andriis-Laptop devit-test-task %
+```
 
 ## Prompt No 48
 Resolve the issue\
 
-```andrey@Andriis-Laptop devit-test-task % npm test
+```
+andrey@Andriis-Laptop devit-test-task % npm test
 
 > product-content-studio@0.1.0 test
 > npm run test:unit && npm run test:integration
@@ -236,7 +239,8 @@ dyld[88087]: Symbol not found: __ZN6apache6thrift12ContextStack23createWithClien
 
 Watchman:  watchman --no-pretty get-sockname returned with exit code=null, signal=SIGABRT, stderr= dyld[88087]: Symbol not found: __ZN6apache6thrift12ContextStack23createWithClientContextERKNSt3__110shared_ptrINS2_6vectorINS3_INS0_22TProcessorEventHandlerEEENS2_9allocatorIS6_EEEEEERKNS3_INS4_INS3_INS0_21ClientInterceptorBaseEEENS7_ISE_EEEEEEPKcSL_RNS0_9transport7THeaderE
   Referenced from: <141A04D3-90F0-393A-AF51-5279D0FDA4D7> /opt/homebrew/Cellar/watchman/2024.11.25.00/bin/watchman
-  Expected in:     <35A81A20-F4AF-3A41-99D7-8EB9CAD68842> /opt/homebrew/Cellar/fbthrift/2025.06.30.00/lib/libasync.1.0.0.dylib```
+  Expected in:     <35A81A20-F4AF-3A41-99D7-8EB9CAD68842> /opt/homebrew/Cellar/fbthrift/2025.06.30.00/lib/libasync.1.0.0.dylib
+```
 
 ## Prompt No 49
 seems like you made tests only for Backend side? Or I am wrong?
@@ -248,7 +252,8 @@ Adjust the Phase 5 in plan to include this as well
 
 ## Prompt No 51
 I did "npm run dev" and "npm run test:e2e" and get this:
-```andrey@Andriis-Laptop devit-test-task % npm run test:e2e
+```
+andrey@Andriis-Laptop devit-test-task % npm run test:e2e
 
 > product-content-studio@0.1.0 pretest:e2e
 > npm run seed
@@ -267,7 +272,8 @@ Instead change the require of index.js in /Users/andrey/Documents/TestTaskProjec
   code: 'ERR_REQUIRE_ESM'
 }
 
-Node.js v20.14.0```
+Node.js v20.14.0
+```
 
 ## Prompt No 52
 Wait, can you please temporaly disable node version check you just added
@@ -407,3 +413,6 @@ Add instruction to AGENTS.md: do not wait for CI checks if you just updating doc
 
 ## Prompt No 91
 Turn PROMPTS-HISTORY into md also
+
+## Prompt No 92
+PROMPTS-HISTORY.md contains formatting error: the logs wrapper in Prompt No 47 is too broad and covered all the next prompts. Check and fix
