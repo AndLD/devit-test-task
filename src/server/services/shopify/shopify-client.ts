@@ -1,4 +1,4 @@
-import type { AxiosResponse } from "axios";
+import type { AxiosInstance, AxiosResponse } from "axios";
 import { httpClient } from "@/server/lib/http-client";
 import {
   ShopifyClientError,
@@ -33,6 +33,9 @@ export class ShopifyAdminApiClient implements ShopifyClient {
   constructor(
     private readonly storeDomain: string,
     private readonly tokenProvider: ShopifyTokenProvider,
+    // Injectable for testing (see AGENTS.md's testability principle) —
+    // defaults to the shared server-side axios instance.
+    private readonly http: AxiosInstance = httpClient,
   ) {}
 
   async fetchProduct(productId: string): Promise<ShopifyProductData> {
@@ -41,7 +44,7 @@ export class ShopifyAdminApiClient implements ShopifyClient {
 
     let response: AxiosResponse;
     try {
-      response = await httpClient.get(url, {
+      response = await this.http.get(url, {
         headers: { "X-Shopify-Access-Token": accessToken },
       });
     } catch {
