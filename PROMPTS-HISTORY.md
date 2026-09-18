@@ -439,3 +439,6 @@ Where in the prompt sequence did the "Try again" message actually occur?
 Not now, now just record known code duplications to docs (probably known limitations or kind of this).
 
 And analyze the codebase quality: evaluate SOLID coverage, auto tests coverage, scalability, maintainability, coupling, testability across the project and write it to docs.
+
+## Prompt No 98
+Add more unit/integration tests for LLM and Shopify to cover the relative test coverage gap

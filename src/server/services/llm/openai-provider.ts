@@ -1,4 +1,4 @@
-import type { AxiosResponse } from "axios";
+import type { AxiosInstance, AxiosResponse } from "axios";
 import { httpClient } from "@/server/lib/http-client";
 import { PRODUCT_CONTENT_LIMITS } from "@/lib/validation/product-limits";
 import type {
@@ -40,12 +40,15 @@ export class OpenAiProvider implements LlmProvider {
   constructor(
     private readonly apiKey: string,
     private readonly model: string = process.env.OPENAI_MODEL || DEFAULT_MODEL,
+    // Injectable for testing (see AGENTS.md's testability principle) —
+    // defaults to the shared server-side axios instance.
+    private readonly http: AxiosInstance = httpClient,
   ) {}
 
   async generate(input: ProductSuggestionInput): Promise<ProductSuggestion> {
     let response: AxiosResponse;
     try {
-      response = await httpClient.post(
+      response = await this.http.post(
         OPENAI_CHAT_COMPLETIONS_URL,
         {
           model: this.model,
