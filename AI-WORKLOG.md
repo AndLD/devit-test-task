@@ -523,4 +523,12 @@ One bug in the tests themselves was caught this way too: an integration test ass
 - **Verification:** Direct comparison against this session's own visible message history; re-ran the numbering-continuity and fence-balance checks after appending the two missing entries — both still clean.
 - **Reference:** [PROMPTS-HISTORY.md](PROMPTS-HISTORY.md)
 
+### 2026-09-18 — Sync "Time spent" with the latest Clockify export (17h03m42s)
+
+- **Task:** The user provided another newer Clockify export (17h03m42s, up from 16h39m28s) and asked to sync README's "Time spent" section with it.
+- **AI contribution:** The new export added exactly one new row not present in the prior one — "Update docs + Refactor env var usage on Docker" (24m14s) — the Postgres env-var consolidation work from the previous turn. Confirmed this was the *only* change by summing the delta (17h03m42s − 16h39m28s = 24m14s, matching the new row exactly) rather than re-deriving every row from scratch. Split its two named activities evenly (Update docs → Docs; Refactor env var usage on Docker → Bonus-Infrastructure, since it's the Docker Compose setup specifically), added a new Docs row (12m07s) and bumped the Infrastructure bonus row (19m57s → 32m04s). Core budget was untouched (no core-related activity in the new row). Verified the three category totals (Core 9h01m28s unchanged, Docs 3h34m58s, Bonus 4h27m16s) sum to the new grand total exactly.
+- **My contribution:** Supplied the newer export and asked for the resync.
+- **Verification:** Arithmetic re-checked twice: the report-level delta (24m14s) matches the one new row's own duration exactly, and the three updated category totals sum to 17h03m42s exactly, matching the report's own reported total.
+- **Reference:** [README.md](README.md) (Time spent section)
+
 <!-- Further entries appended below as implementation proceeds. -->
