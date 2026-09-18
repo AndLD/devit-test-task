@@ -434,3 +434,8 @@ Where in the prompt sequence did the "Try again" message actually occur?
 ## Prompt No 96
 - Refactor: Admin product editor form constraints e.g. "{ description: 1000, seoTitle: 60, seoDescription: 160 }" and similar are now repeated at several places across the app. Put it in a single place so these validation constraints would be managable constant at single place.
 - Check other similar utility code duplications. You should now just identify these kinds of code duplications and ask for my approve if we need to fix them.
+
+## Prompt No 97
+Not now, now just record known code duplications to docs (probably known limitations or kind of this).
+
+And analyze the codebase quality: evaluate SOLID coverage, auto tests coverage, scalability, maintainability, coupling, testability across the project and write it to docs.
