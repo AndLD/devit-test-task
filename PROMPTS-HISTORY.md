@@ -462,3 +462,35 @@ Merge develop branch to main branch and make repository public instead of privat
 AI-WORKLOG.md references your real trial Shopify store domain (id111w-aj.myshopify.com). Redact it before going public?
 
 Yes, redact it
+
+## Prompt No 104
+Verify AI-WORKLOG-SUMMARY and AI-WORKLOG are synchronized. And also link AI-WORKLOG-SUMMARY, PROJECT-REQUIREMENTS and PROMPTS-HISTORY to README (so every doc file is mentioned on the main doc entry file, which is README).
+
+## Prompt No 105
+Provide manual testing instruction for checking the core user flows and write this to a separated md file linked to README. (so reviewer and I and any other people can follow these steps/cases to verify the project is completed fine).
+
+## Prompt No 106
+Destroy active docker containers and execute Getting started flow yourself and verify it is running correct. Then destroy containers and run full containerized version from scratch and verify it is running correct
+
+## Prompt No 107
+- Verify PROMPTS-HISTORY is sync.
+
+## Prompt No 108
+@"/Users/andrey/Downloads/Clockify_Time_Report_Summary_14_09_2026-20_09_2026 (2).pdf"
+See the new updated time report from Clockify. Verify entries dates are correct and sync time report in README with new time records from Clockify
+
+## Prompt No 109
+Check how full containerized app related Docker files reuse env vars. Seems like it include some duplications, for example, PostgreSQL DB URL. Is it relevant? Do not fix it without approve
+
+## Prompt No 110
+You should consolidate it and make .env file as the primary source of truth for such vars like Postgres-related ones
+
+## Prompt No 111
+It (env vars refactor we did) does not break db-related integration tests that rely on Docker or any tests, isn't it?
+
+## Prompt No 112
+Verify PROMPTS-HISTORY is sync
+
+## Prompt No 113
+@"/Users/andrey/Downloads/Clockify_Time_Report_Summary_14_09_2026-20_09_2026 (3).pdf"
+See the new updated time report from Clockify. Sync time report in README with new time records from Clockify
