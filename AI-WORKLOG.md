@@ -491,4 +491,16 @@ One bug in the tests themselves was caught this way too: an integration test ass
 - **Verification:** Direct line-by-line comparison against this session's own visible message history (not a summary), plus the same two mechanical checks (numbering, fence balance) used in the prior sync passes.
 - **Reference:** [PROMPTS-HISTORY.md](PROMPTS-HISTORY.md)
 
+### 2026-09-18 — Sync "Time spent" with the latest Clockify export; verify entry dates
+
+- **Task:** The user provided a newer Clockify export (16h39m28s total, up from 13h46m42s) and asked to verify AI-WORKLOG.md's entry dates are still correct and to sync README's "Time spent" section with the new figures.
+- **AI contribution:**
+  - **Date verification:** the new report's daily breakdown shows Sep 14–17 totals byte-identical to the prior report (00:25:55 / 00:38:45 / 03:38:46 / 05:13:30); only Sep 18 grew, from 3:49:46 to 6:42:32 — a difference of exactly 2h52m46s, matching the sum of the six new description rows in the report to the second. Cross-checked that every AI-WORKLOG.md entry from the CI-skip-policy entry onward (the batch of work this session logged today) is already dated 2026-09-18 — confirmed via `grep` over the `### 2026-09-18` headers. No date corrections were needed.
+  - **Time-spent sync:** identified the six new report rows not present in the prior export (CI-skip + PROMPTS-HISTORY→md, LLM/Shopify coverage tests + docs + planning, an "Evaluate docs + Planning" entry, the PRODUCT_CONTENT_LIMITS refactor + small fixes + docs entry, the manual-testing-guide + from-scratch verification entry, and this time-report update itself), summing to exactly the 2h52m46s delta. Split each multi-activity entry evenly across its named activities using the same methodology as the prior pass, and allocated each activity to Core/Docs/Bonus (further split into Design/LLM/Shopify/Infrastructure/cross-cutting-axios for Bonus) based on what it actually touched — e.g. the LLM/Shopify test-coverage work's activity was split 50/50 between the two bonus features it covered, and "Test full containerized launch" went to Bonus-Infrastructure specifically rather than a generic Docs bucket, since it re-verifies that bonus feature end to end.
+  - Verified the new category totals (Core 9h01m28s, Docs 3h22m51s, Bonus 4h15m09s) sum to the report's own 16h39m28s total exactly, the same three-way cross-check used in the prior sync (per-activity sums back to entry duration; per-category sums back to category total; categories sum back to grand total).
+  - Updated the "over budget" explanatory prose for both Core and Bonus to name the *new* reasons for the larger overage (post-launch maintenance time for Core; the coverage-gap and from-scratch-verification work for Bonus) rather than just bumping the numbers and leaving stale reasoning in place.
+- **My contribution:** Supplied the newer Clockify export and asked for both the date check and the resync explicitly.
+- **Verification:** Every number traces to arithmetic performed on the report's own rows in this turn (documented via the daily-breakdown delta check and the three-way sum cross-check above), not carried over or estimated from the prior sync pass.
+- **Reference:** [README.md](README.md) (Time spent section)
+
 <!-- Further entries appended below as implementation proceeds. -->

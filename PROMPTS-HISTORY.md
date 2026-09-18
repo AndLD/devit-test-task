@@ -474,3 +474,7 @@ Destroy active docker containers and execute Getting started flow yourself and v
 
 ## Prompt No 107
 - Verify PROMPTS-HISTORY is sync.
+
+## Prompt No 108
+@"/Users/andrey/Downloads/Clockify_Time_Report_Summary_14_09_2026-20_09_2026 (2).pdf"
+See the new updated time report from Clockify. Verify entries dates are correct and sync time report in README with new time records from Clockify
