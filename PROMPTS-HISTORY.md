@@ -484,3 +484,9 @@ Check how full containerized app related Docker files reuse env vars. Seems like
 
 ## Prompt No 110
 You should consolidate it and make .env file as the primary source of truth for such vars like Postgres-related ones
+
+## Prompt No 111
+It (env vars refactor we did) does not break db-related integration tests that rely on Docker or any tests, isn't it?
+
+## Prompt No 112
+Verify PROMPTS-HISTORY is sync

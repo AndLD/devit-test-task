@@ -515,4 +515,12 @@ One bug in the tests themselves was caught this way too: an integration test ass
 - **Verification:** `docker compose config` (grep-filtered after the exposure above) confirmed `migrate` and `web` both resolve to the identical, correct `DATABASE_URL`, matching the pre-consolidation hardcoded value exactly. Did a full from-scratch run (`docker compose down -v` then `docker compose up --build -d`): `postgres`'s healthcheck reported `healthy` (confirming the interpolated `pg_isready -U` still works), `migrate` applied migrations and seeded successfully, and the running `web` container served the correct catalog/draft-404 behavior via `curl`. `npx tsc --noEmit`/`npm run lint` clean (no application code touched). Restored the environment to its normal local-dev state afterward.
 - **Reference:** [docker-compose.yml](docker-compose.yml), [.env.example](.env.example), [README.md](README.md) (Running the whole app via Docker Compose, Environment variables sections)
 
+### 2026-09-18 — Re-verify PROMPTS-HISTORY.md sync: found and fixed two missing entries
+
+- **Task:** Another sync check, requested right after the Postgres env-var consolidation work.
+- **AI contribution:** This time the check found a real gap: the two most recent user messages (the "does this break DB-related integration tests?" question, and this verification request itself) had never been logged — the file's last entry was still Prompt No 110. Numbering continuity (`grep`/`awk`) and code-fence balance (`grep -c`) both still checked out clean otherwise. Appended the two missing messages as Prompt No 111 and 112, verbatim.
+- **My contribution:** Asked for the recheck.
+- **Verification:** Direct comparison against this session's own visible message history; re-ran the numbering-continuity and fence-balance checks after appending the two missing entries — both still clean.
+- **Reference:** [PROMPTS-HISTORY.md](PROMPTS-HISTORY.md)
+
 <!-- Further entries appended below as implementation proceeds. -->
