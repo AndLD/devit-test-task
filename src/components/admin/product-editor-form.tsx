@@ -11,18 +11,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { authenticatedRequest } from "@/lib/authenticated-request";
 import { cn } from "@/lib/utils";
 import type { Product, ProductStatus } from "@/lib/types/product";
+import { PRODUCT_CONTENT_LIMITS as LIMITS } from "@/lib/validation/product-limits";
 
 interface ContentSuggestion {
   description: string;
   seoTitle: string;
   seoDescription: string;
 }
-
-const LIMITS = {
-  description: 1000,
-  seoTitle: 60,
-  seoDescription: 160,
-} as const;
 
 function isFieldValid(value: string, max: number) {
   const trimmed = value.trim();

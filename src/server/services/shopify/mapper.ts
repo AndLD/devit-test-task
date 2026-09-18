@@ -1,8 +1,7 @@
 import { productContentFieldsSchema } from "@/lib/validation/product";
+import { PRODUCT_CONTENT_LIMITS as LIMITS } from "@/lib/validation/product-limits";
 import type { ProductCharacteristic } from "@/lib/types/product";
 import type { ShopifyProductData } from "./types";
-
-const LIMITS = { description: 1000, seoTitle: 60, seoDescription: 160 } as const;
 
 // Shopify's product description is HTML (see the real "Bluetooth Wireless
 // Earbuds" test fixture pulled from a live store during development, which

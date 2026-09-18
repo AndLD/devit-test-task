@@ -1,5 +1,6 @@
 import type { AxiosResponse } from "axios";
 import { httpClient } from "@/server/lib/http-client";
+import { PRODUCT_CONTENT_LIMITS } from "@/lib/validation/product-limits";
 import type {
   LlmProvider,
   ProductSuggestion,
@@ -10,12 +11,15 @@ import { LlmProviderError } from "./types";
 const OPENAI_CHAT_COMPLETIONS_URL = "https://api.openai.com/v1/chat/completions";
 const DEFAULT_MODEL = "gpt-4o-mini";
 
+// Interpolates PRODUCT_CONTENT_LIMITS so the limits described to the model
+// can't silently drift from the limits actually enforced afterward (see
+// suggestion-service.ts's sanitize()).
 const SYSTEM_PROMPT = `Ти — копірайтер для інтернет-магазину. За назвою товару та його характеристиками згенеруй контент українською мовою для картки товару.
 
 Поверни ЛИШЕ JSON-об'єкт з трьома полями:
-- "description": опис товару, до 1000 символів, не порожній.
-- "seoTitle": SEO-заголовок сторінки, до 60 символів, не порожній.
-- "seoDescription": SEO-опис сторінки, до 160 символів, не порожній.
+- "description": опис товару, до ${PRODUCT_CONTENT_LIMITS.description} символів, не порожній.
+- "seoTitle": SEO-заголовок сторінки, до ${PRODUCT_CONTENT_LIMITS.seoTitle} символів, не порожній.
+- "seoDescription": SEO-опис сторінки, до ${PRODUCT_CONTENT_LIMITS.seoDescription} символів, не порожній.
 
 Не додавай нічого, крім цього JSON-об'єкта.`;
 

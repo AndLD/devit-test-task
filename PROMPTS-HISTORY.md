@@ -430,3 +430,7 @@ I guess Try again prompt was not at 93 position. It was earlier, check again
 Where in the prompt sequence did the "Try again" message actually occur?
 
 "Try again" prompt occur after this prompt: "Okay, then replace fetch with axios also for backend node.js side (and define it as instruction to AGENTS.md)"
+
+## Prompt No 96
+- Refactor: Admin product editor form constraints e.g. "{ description: 1000, seoTitle: 60, seoDescription: 160 }" and similar are now repeated at several places across the app. Put it in a single place so these validation constraints would be managable constant at single place.
+- Check other similar utility code duplications. You should now just identify these kinds of code duplications and ask for my approve if we need to fix them.

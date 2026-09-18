@@ -3,8 +3,7 @@ import type {
   ProductSuggestion,
   ProductSuggestionInput,
 } from "./types";
-
-const LIMITS = { description: 1000, seoTitle: 60, seoDescription: 160 };
+import { PRODUCT_CONTENT_LIMITS as LIMITS } from "@/lib/validation/product-limits";
 
 function truncate(value: string, max: number): string {
   return value.length > max ? value.slice(0, max).trim() : value;
