@@ -462,3 +462,6 @@ Merge develop branch to main branch and make repository public instead of privat
 AI-WORKLOG.md references your real trial Shopify store domain (id111w-aj.myshopify.com). Redact it before going public?
 
 Yes, redact it
+
+## Prompt No 104
+Verify AI-WORKLOG-SUMMARY and AI-WORKLOG are synchronized. And also link AI-WORKLOG-SUMMARY, PROJECT-REQUIREMENTS and PROMPTS-HISTORY to README (so every doc file is mentioned on the main doc entry file, which is README).
