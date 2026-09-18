@@ -1,10 +1,9 @@
 import { productContentFieldsSchema } from "@/lib/validation/product";
+import { PRODUCT_CONTENT_LIMITS as LIMITS } from "@/lib/validation/product-limits";
 import { MockLlmProvider } from "./mock-provider";
 import { OpenAiProvider } from "./openai-provider";
 import type { LlmProvider, ProductSuggestion, ProductSuggestionInput } from "./types";
 import { LlmProviderError } from "./types";
-
-const LIMITS = { description: 1000, seoTitle: 60, seoDescription: 160 } as const;
 
 export class InvalidSuggestionError extends Error {
   constructor() {
