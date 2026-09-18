@@ -1,6 +1,6 @@
 # Product Content Studio
 
-> **Status: core functionality (Phases 1–6) complete, all four bonus tasks attempted** — admin UI, public catalog/product pages, a full automated test suite (backend unit + testcontainers-backed integration, frontend component unit + integration, Cypress e2e), full-stack Docker Compose + CI, AI content suggestions (OpenAI), and Shopify import are all in place. Design Tools is partial (admin screens designed in Figma, public screens built directly in code); LLM/Shopify real-mode network calls are implemented but weren't exercised live in this session — see their sections below for exactly what was and wasn't verified. See [DEVELOPMENT-PLAN.md](DEVELOPMENT-PLAN.md), [AGENTS.md](AGENTS.md) for strategic/technical decisions, and [AI-WORKLOG.md](AI-WORKLOG.md) for AI usage notes.
+> **Status: core functionality (Phases 1–6) complete, all four bonus tasks attempted** — admin UI, public catalog/product pages, a full automated test suite (backend unit + testcontainers-backed integration, frontend component unit + integration, Cypress e2e), full-stack Docker Compose + CI, AI content suggestions (OpenAI), and Shopify import are all in place. Design Tools is partial (admin screens designed in Figma, public screens built directly in code). Shopify import's real Admin API call was verified live end-to-end against a real test store; OpenAI's real mode is implemented and covered by the same tests but wasn't exercised against the live API in this session — see their sections below for exactly what was and wasn't verified. See [DEVELOPMENT-PLAN.md](DEVELOPMENT-PLAN.md), [AGENTS.md](AGENTS.md) for strategic/technical decisions, and [AI-WORKLOG.md](AI-WORKLOG.md) for AI usage notes.
 
 A small product-card editor for an online store: managers edit description/SEO fields and publish product cards in a private admin panel; visitors browse a public catalog of published products.
 
@@ -60,6 +60,8 @@ The app is available at `http://localhost:3000`. Admin pages (`/admin/login`, `/
 - `GET /api/admin/products` — all products (id, name, status); requires auth
 - `GET /api/admin/products/[id]` — full product detail; requires auth
 - `PATCH /api/admin/products/[id]` — update `description`/`seoTitle`/`seoDescription`/`status` (Zod-validated server-side, same limits as the editor); requires auth
+- `POST /api/admin/products/[id]/suggest` — generates an AI content suggestion (mock or real, see "AI content suggestions" below); requires auth
+- `POST /api/admin/products/import` — `{ productId }`, imports a product from Shopify as a new draft (see "Shopify import" below); requires auth
 - `/admin/*` pages (except `/admin/login`) redirect to `/admin/login` without a valid access token
 
 ## Running the whole app via Docker Compose
@@ -131,7 +133,8 @@ See `.env.example` for the full list (no real secrets committed). Expected varia
 - `DATABASE_URL` — PostgreSQL connection string
 - `JWT_ACCESS_SECRET` / `JWT_REFRESH_SECRET` — signing secrets for the access+refresh token auth pattern
 - `OPENAI_API_KEY` — optional, only needed to exercise the real (non-mocked) LLM bonus feature
-- `SHOPIFY_STORE_DOMAIN` / `SHOPIFY_ADMIN_API_TOKEN` — optional, only needed for the Shopify import bonus feature
+- `SHOPIFY_STORE_DOMAIN` — optional, only needed for the Shopify import bonus feature
+- `SHOPIFY_ADMIN_API_TOKEN` **or** `SHOPIFY_CLIENT_ID`/`SHOPIFY_CLIENT_SECRET` — one auth method for the Shopify import bonus; see "Shopify import" below for which to use and how to get it
 
 ## AI content suggestions (bonus)
 
@@ -154,9 +157,14 @@ An "Import from Shopify" form on the admin product list (`ShopifyImportForm`) fe
 
 Every field is re-validated against the same limits as a manual save before the row is created (`mapShopifyProduct`, `src/server/services/shopify/mapper.ts`) — truncated if too long, and the import is rejected outright if there's truly no usable content (an empty title and description), the same "truncate, don't silently accept garbage" approach as the LLM feature above.
 
-**Setup:** set `SHOPIFY_STORE_DOMAIN` (e.g. `your-store.myshopify.com`) and `SHOPIFY_ADMIN_API_TOKEN` in `.env` — see `.env.example`. Without both, the import form shows a plain "not configured" error (503) rather than crashing; there's no mock mode for this bonus (PROJECT-REQUIREMENTS.md doesn't ask for one here, unlike the LLM integration).
+**Setup:** set `SHOPIFY_STORE_DOMAIN` (e.g. `your-store.myshopify.com`) in `.env`, plus one of two auth methods (see `.env.example`):
 
-**Known limitation:** the real Admin API call (`ShopifyAdminApiClient`, `src/server/services/shopify/shopify-client.ts`) wasn't exercised against a live store in this development session — a Shopify Admin API access token has to be created by hand in that store's admin ("Settings → Apps → Develop apps"), and none was available here. What **was** verified: two real products were created in a live Shopify trial store (via a connected Shopify MCP tool) and their actual data fetched back from the live Admin API; that real data (HTML description, options, vendor, product type — see `tests/unit/shopify-mapper.test.ts`'s fixture) was used to confirm the mapping/sanitization logic produces correct output, and `tests/integration/admin-import.test.ts` exercises the full create-in-database path against a real testcontainers Postgres with only the network call to Shopify faked. If you have a real store and token, set them in `.env` and try importing a product yourself — everything from that point on (the actual `fetch` call, response parsing) is the one part not exercised live here.
+- `SHOPIFY_CLIENT_ID` + `SHOPIFY_CLIENT_SECRET` — the current path for any app created after 2026-01-01, when Shopify moved custom-app creation to the [Dev Dashboard](https://dev.shopify.com/dashboard/) and dropped the old directly-revealed static token. The app itself exchanges these for a short-lived (~24h) access token and refreshes it automatically (`ClientCredentialsTokenProvider`, `src/server/services/shopify/token-provider.ts`) — no manual token refresh needed. To get these: create an app in the Dev Dashboard, add the `read_products` scope, **install the app on your store** (a separate step from creating it — skipping it produces an `app_not_installed` error), then copy the Client ID/Secret from the app's Settings.
+- `SHOPIFY_ADMIN_API_TOKEN` — a static token, only available if you have a "legacy" custom app created before that date (`StaticTokenProvider`).
+
+Without either configured, the import form shows a plain "not configured" error (503) rather than crashing; there's no mock mode for this bonus (PROJECT-REQUIREMENTS.md doesn't ask for one here, unlike the LLM integration).
+
+**Verified live, end to end:** the real Admin API call (`ShopifyAdminApiClient`, `src/server/services/shopify/shopify-client.ts`) was exercised against a real Shopify trial store created for this purpose — two products were added there (via a connected Shopify MCP tool), a Dev Dashboard app was set up with the client-credentials flow above, and importing one of those products through the running app's own UI produced a correctly-mapped draft product (HTML description cleaned to plain text, options mapped to characteristics, SEO fields derived) via a real network round trip, not a fake. `tests/unit/shopify-mapper.test.ts` and `tests/integration/admin-import.test.ts` use that same product's real fetched data (including its actual HTML) as their fixture, so the mapping logic is verified against genuine Shopify output both in the live run and in the automated suite.
 
 ## Architecture notes
 
@@ -172,7 +180,7 @@ Current folder structure:
 - `src/server/repositories/` — thin Prisma wrappers (`AdminUserRepository`, `RefreshTokenRepository`, `ProductRepository`), the only layer that imports the generated Prisma client.
 - `src/server/services/` — framework-free business logic (`AuthService`, `ProductService`) built on repository interfaces, so they're unit-testable with fake repositories (no DB, no Next.js) per the testability principle in [AGENTS.md](AGENTS.md).
 - `src/server/services/llm/` — the LLM bonus's provider abstraction: `types.ts` (the `LlmProvider` interface), `mock-provider.ts` / `openai-provider.ts` (the two implementations), `suggestion-service.ts` (picks one based on `OPENAI_API_KEY` and validates the result) — see "AI content suggestions" above.
-- `src/server/services/shopify/` — the Shopify import bonus: `types.ts` (the `ShopifyClient` interface), `shopify-client.ts` (the real Admin API client), `mapper.ts` (Shopify product → this app's fields, with the same truncate/validate pass as the LLM feature), `import-service.ts` (slug uniqueness + the actual DB write) — see "Shopify import" above.
+- `src/server/services/shopify/` — the Shopify import bonus: `types.ts` (the `ShopifyClient` interface), `shopify-client.ts` (the real Admin API client), `token-provider.ts` (the two auth methods — a static token, or the client-credentials exchange with auto-refresh), `mapper.ts` (Shopify product → this app's fields, with the same truncate/validate pass as the LLM feature), `import-service.ts` (slug uniqueness + the actual DB write) — see "Shopify import" above.
 - `src/lib/validation/` — Zod schemas (`product.ts`, `auth.ts`) shared by client forms (Phase 4) and server Route Handlers, so invalid data is rejected identically everywhere, including direct API calls.
 - `src/lib/types/` — domain types decoupled from Prisma's generated types.
 - `prisma/schema.prisma` — `AdminUser`, `RefreshToken` (access+refresh JWT pattern), and `Product` models.
@@ -188,8 +196,7 @@ Full principles in [AGENTS.md](AGENTS.md).
 ## Known limitations / incomplete parts
 
 - Design Tools bonus: the public catalog/product pages were implemented directly in code (matching the admin UI's visual language) rather than being designed in Figma first, unlike the admin screens.
-- LLM integration bonus: real mode (OpenAI) is implemented but wasn't exercised against the live API in this session — no API key was available. Mock mode is fully implemented and tested. See "AI content suggestions" above.
-- Shopify import bonus: the real Admin API call wasn't exercised against a live store in this session — no Admin API access token was available (a Shopify Admin API token has to be created by hand in the Shopify admin's "custom app" settings; nothing here can generate one). The mapping logic was verified against real product data from a live Shopify test store instead. See "Shopify import" below.
+- LLM integration bonus: real mode (OpenAI) is implemented but wasn't exercised against the live API in this session — no API key was available. Mock mode is fully implemented and tested. See "AI content suggestions" above. (The Shopify import bonus's real Admin API call, by contrast, *was* verified live end to end — see "Shopify import" below.)
 
 ## Time spent
 
@@ -221,7 +228,7 @@ Phase 3 (design) was originally miscounted into the core total in an earlier dra
 | Bonus                                | Status      | Notes                                                                                                                                                                                                                                                                                        |
 | ------------------------------------ | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | LLM integration (OpenAI)             | Done (mock mode fully verified; real mode implemented but not exercised live — no API key in this environment) | "Suggest with AI" button on the product editor generates description/SEO fields in Ukrainian from the product's name and characteristics. See "AI content suggestions" below. |
-| Shopify import                       | Done (verified against a real test store's data; live network call not exercised — no Admin API token in this environment) | An "Import from Shopify" form on the admin product list creates a new draft product from a Shopify product ID. See "Shopify import" below. |
+| Shopify import                       | Done, verified live end-to-end against a real test store | An "Import from Shopify" form on the admin product list creates a new draft product from a Shopify product ID. See "Shopify import" below. |
 | Design Tools (Figma → code)          | In progress (~1h of the ~2–3h bonus budget) | [Figma file](https://www.figma.com/design/XEWl5YinPePK2aQajd9xE3/Product-Content-Studio-%E2%80%94-UI-Design?node-id=0-1&t=u1ntu3s3m0f4qGVE-1) — Admin Login, Product List, Product Editor (desktop+mobile) designed and transferred to shadcn/ui components; see [AI-WORKLOG.md](AI-WORKLOG.md) for the transfer notes. Public catalog/product pages were built directly in code (reusing the same design language) rather than designed in Figma first. |
 | Infrastructure (Docker Compose / CI) | Done | `docker compose up` now runs the whole app (Postgres + a one-off `migrate` job + the Next.js app itself), not just the database — see "Running the whole app via Docker Compose" below. GitHub Actions CI ([.github/workflows/ci.yml](.github/workflows/ci.yml)) runs on every push/PR: lint, both `tsc --noEmit` targets, build, all four Jest suites (backend unit/integration via testcontainers, frontend unit/integration), and the Cypress e2e suite against a Postgres service container. |
 
