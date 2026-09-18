@@ -451,3 +451,6 @@ Why do we have jest.config.js as js and not ts file? Should not we make it ts as
 
 ## Prompt No 101
 Verify setup instructions in README. Is it valid? I see docker compose up is suggested for getting ready just PostgreSQL locally, but I guess it also run next production, no?
+
+## Prompt No 102
+Verify all docs consistency. Also verify all project requirements are covered

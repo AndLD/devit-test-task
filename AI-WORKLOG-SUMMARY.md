@@ -17,7 +17,7 @@ Split of contribution: Claude Code wrote all application, test, and documentatio
 
 **1. `requireAdminId()` refactored to take `NextRequest` instead of `next/headers`' `cookies()`.**
 The original implementation only worked inside Next's own request-handling machinery, which meant the admin Route Handlers couldn't be invoked directly in an integration test — a real Next.js server would have been needed just to test authorization logic. Changed the function to read `request.cookies` from the `NextRequest` a Route Handler already receives, making it a plain, directly-testable function of its input.
-*Verified:* the full backend integration suite (16 tests, including auth-gating scenarios) calls Route Handlers directly with a hand-built `NextRequest` and passes without a live server; the real admin flow was also re-checked live in `next dev` to confirm the refactor didn't regress anything.
+*Verified:* the backend integration suite (including auth-gating scenarios) calls Route Handlers directly with a hand-built `NextRequest` and passes without a live server; the real admin flow was also re-checked live in `next dev` to confirm the refactor didn't regress anything. This suite has grown substantially since (25 integration tests as of README's current test-count table) — all still exercise `requireAdminId()` the same way.
 *Reference:* [src/server/auth/guard.ts](src/server/auth/guard.ts)
 
 **2. A draft/unknown product page returned HTTP 200 instead of 404 — a genuine Next.js App Router limitation, not an app bug.**
@@ -27,7 +27,7 @@ The original implementation only worked inside Next's own request-handling machi
 
 **3. Jest configured to run under native ESM instead of the default CommonJS + ts-jest setup.**
 Prisma 7's generated client uses `import.meta.url` (to locate its wasm query compiler) and `jose` (JWT signing) ships ESM-only with no CJS build — both throw `Must use import to load ES Module` under Jest's default CommonJS transform, and both are unavoidable (the integration tests need the real Prisma client; `tokens.ts` needs `jose`). Configured the backend Jest projects with `ts-jest/presets/default-esm` and `NODE_OPTIONS=--experimental-vm-modules` instead of trying to work around either dependency.
-*Verified:* full backend suite (39 unit + 16 integration tests) passes under the new config; confirmed the frontend Jest projects didn't need the same treatment (component code never imports Prisma or `jose`), so they stayed on the simpler CJS transform.
+*Verified:* the full backend suite passed under the new config at the time (39 unit + 16 integration tests then; since grown to 84 unit + 25 integration — see README's "Testing strategy & rationale" for the current count — all still running under this same ESM setup); confirmed the frontend Jest projects didn't need the same treatment (component code never imports Prisma or `jose`), so they stayed on the simpler CJS transform.
 *Reference:* [jest.config.js](jest.config.js)
 
 ## Role of automated tests in verifying AI-generated code
