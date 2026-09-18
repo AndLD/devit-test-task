@@ -494,3 +494,9 @@ Verify PROMPTS-HISTORY is sync
 ## Prompt No 113
 @"/Users/andrey/Downloads/Clockify_Time_Report_Summary_14_09_2026-20_09_2026 (3).pdf"
 See the new updated time report from Clockify. Sync time report in README with new time records from Clockify
+
+## Prompt No 114
+Merge develop branch to main
+
+## Prompt No 115
+Now verify the project is fully ready to send it to the reviewer
