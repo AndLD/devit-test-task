@@ -414,4 +414,12 @@ One bug in the tests themselves was caught this way too: an integration test ass
 - **Verification:** `npx tsc --noEmit`, `npm run lint`, `npm run build` all clean (route list unchanged). Full Jest suite green: 84 unit (was 67) + 25 integration + 28 frontend = 137 tests. Re-ran the same `jest --coverage` command used in the quality review to get before/after numbers rather than estimating the improvement.
 - **Reference:** [tests/unit/openai-provider.test.ts](tests/unit/openai-provider.test.ts), [tests/unit/shopify-client.test.ts](tests/unit/shopify-client.test.ts), [src/server/services/llm/openai-provider.ts](src/server/services/llm/openai-provider.ts), [src/server/services/shopify/shopify-client.ts](src/server/services/shopify/shopify-client.ts), [CODE-QUALITY-REVIEW.md](CODE-QUALITY-REVIEW.md)
 
+### 2026-09-18 — Docs: test-count-per-layer table
+
+- **Task:** The user pointed out README had no living summary of how many automated tests exist per layer, or in total — only historical, dated counts scattered across AI-WORKLOG entries (which can conflict with each other as the suite grows, since each is a point-in-time record, not a maintained total).
+- **AI contribution:** Re-ran each Jest project (`test:unit`, `test:integration`, `test:frontend-unit`, `test:frontend-integration`) rather than trusting a remembered number, and recounted the Cypress suite with `grep -cE "^\s*it\("` per spec file — the first, naive `grep -c "it("` attempt overcounted (it matches substrings like `wait(`/`visit(`/`submit(` too), giving 25 instead of the correct 15; caught by spot-checking `admin.cy.ts`'s actual `it(` blocks by eye before trusting the number. Added a small table to README's "Testing strategy & rationale" section: per-layer counts, a Jest subtotal (137), and a grand total including Cypress (152), each row linked to the command that reproduces it, with an explicit note that the table is a point-in-time count and `npm test`/`npm run test:e2e` are the authoritative source if it ever drifts.
+- **My contribution:** Asked the question that surfaced the gap.
+- **Verification:** Every number in the new table came from an actual command run in this turn, not from memory or from an earlier AI-WORKLOG entry — cross-checked the Cypress count twice after the grep miscount to be sure.
+- **Reference:** [README.md](README.md) (Testing strategy & rationale section)
+
 <!-- Further entries appended below as implementation proceeds. -->

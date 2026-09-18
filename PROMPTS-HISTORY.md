@@ -442,3 +442,6 @@ And analyze the codebase quality: evaluate SOLID coverage, auto tests coverage, 
 
 ## Prompt No 98
 Add more unit/integration tests for LLM and Shopify to cover the relative test coverage gap
+
+## Prompt No 99
+Should not we write count of auto tests per chapter and general one to docs?

@@ -107,6 +107,18 @@ All of this — lint, both `tsc --noEmit` targets, build, all four Jest suites, 
 
 Four layers, matching the testability principle in [AGENTS.md](AGENTS.md):
 
+| Layer | Command | Count |
+| --- | --- | --- |
+| Backend unit | `npm run test:unit` | 84 |
+| Backend integration | `npm run test:integration` | 25 |
+| Frontend unit | `npm run test:frontend-unit` | 9 |
+| Frontend integration | `npm run test:frontend-integration` | 19 |
+| **Jest total** | `npm test` | **137** |
+| End-to-end (Cypress) | `npm run test:e2e` | 15 |
+| **Grand total** | | **152** |
+
+Counts as of the PR that last touched this table — the number will drift as tests are added; `npm test` (Jest) and `npm run test:e2e` (Cypress) are always the authoritative current counts if this table is ever stale.
+
 - **Backend unit tests** (`tests/unit/`) — no DB, no Next.js, no Docker. Cover the framework-free business logic that's injected with fake repositories instead of Prisma (`ProductService`, `AuthService`), the shared Zod validation schemas (field length limits, non-empty, status enum), JWT sign/verify round-trips and tamper rejection (`tokens.ts`), and password hashing (`passwords.ts`). This is only possible because the repository/service split in AGENTS.md makes every repository dependency an injectable, structurally-typed parameter — a fake object satisfying the same shape as `ProductRepository`/`AdminUserRepository`/`RefreshTokenRepository` is enough, no mocking framework needed.
 - **Backend integration tests** (`tests/integration/`) — exercise the actual Next.js Route Handlers (imported and invoked directly with a constructed `NextRequest`, no HTTP server needed) against a real, disposable PostgreSQL container per test run (`testcontainers`, migrated with `prisma migrate deploy`), truncated between tests. Nothing is mocked at the DB layer here. These cover the critical end-to-end scenarios named in AGENTS.md's Phase 5 plan:
   - **Draft invisibility** — the public API (`/api/products`, `/api/products/[slug]`) never returns a draft, whether listed or requested directly by slug (404, same as an unknown slug).
