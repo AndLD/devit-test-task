@@ -13,6 +13,7 @@ A small product-card editor for an online store: managers edit description/SEO f
 - [AI-WORKLOG-SUMMARY.md](AI-WORKLOG-SUMMARY.md) — a short version of the above, covering just what the task requirements ask for.
 - [PROMPTS-HISTORY.md](PROMPTS-HISTORY.md) — a verbatim, append-only log of every prompt sent to the AI agent throughout the project.
 - [CODE-QUALITY-REVIEW.md](CODE-QUALITY-REVIEW.md) — a SOLID/coupling/testability/test-coverage self-assessment of the codebase.
+- [MANUAL-TESTING-GUIDE.md](MANUAL-TESTING-GUIDE.md) — step-by-step scenarios for manually verifying the core (and bonus) user flows in a running app, for anyone who'd rather click through the app than read the code or the automated tests.
 
 ## Tech stack
 
