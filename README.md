@@ -201,28 +201,43 @@ Full principles in [AGENTS.md](AGENTS.md).
 
 ## Time spent
 
-Tracked attentively in Clockify (not estimated from commit timestamps — an earlier draft of this section did that and undercounted real elapsed time, since it couldn't see breaks between work sessions). Per-phase durations below are exact where a logged time entry maps to a single phase; where one entry spans multiple activities (e.g. "Execute Phase 4 + Fix missing-slug + ... + Execute Phase 5"), its duration is split evenly across the number of distinct activities named, since Clockify's summary export doesn't sub-divide a single entry further.
+Tracked attentively in Clockify (not estimated from commit timestamps — an earlier draft of this section did that and undercounted real elapsed time, since it couldn't see breaks between work sessions). Figures below are from Clockify's full report covering the whole project (14–20 Sep 2026, total **13h46m42s**), superseding an earlier draft that only covered a partial export (through Phase 5, 8h41m47s). Per-phase durations are exact where a logged time entry maps to a single activity; where one entry spans multiple named activities (e.g. "Execute Phase 4 + Fix missing-slug + ... + Execute Phase 5"), its duration is split evenly across the number of activities named, since Clockify's summary export doesn't sub-divide a single tracked entry any further. All figures below were verified to sum back to the report's own total.
 
 **Core budget (target: 6–8h):**
 
 | Phase                                                    | Time         |
 | --------------------------------------------------------- | ------------ |
-| Planning & AI harness setup (AGENTS.md/DEVELOPMENT-PLAN.md/AI-WORKLOG.md, Git Flow policy, harness corrections) | 2h58m50s     |
+| Planning & AI harness setup (AGENTS.md/DEVELOPMENT-PLAN.md/AI-WORKLOG.md, Git Flow policy, harness corrections) | 3h26m45s     |
 | Phase 1 — scaffolding                                      | 53m43s       |
 | Phase 2 — backend core (JWT auth, product APIs, seed)       | 33m55s       |
 | Phase 4 — UI implementation (admin + public) + the missing-slug fix, token-refresh wiring, and axios migration done along the way | 1h17m54s     |
 | Phase 5 — automated tests (backend + frontend + Cypress e2e) and the Node-version/ESM tooling fixes | 1h56m42s     |
-| **Core total (through Phase 5)**                           | **7h41m04s** |
+| **Core total**                                             | **8h08m59s** |
 
-This fits inside the 6–8h core budget in AGENTS.md, though Phase 6 (this docs pass) isn't included above — it wasn't logged in Clockify separately in time to make this report, so actual core time is somewhat higher once it's added.
+This is very slightly (~9 minutes) over the 6–8h target in AGENTS.md — the whole overage is a single "Planning final steps" entry (27m55s) that wasn't captured in the earlier partial export; the practical scope of core work didn't change between drafts.
+
+**Docs budget (Phase 6 + ongoing docs maintenance, not a phase with its own time target in AGENTS.md):**
+
+| Activity                                                                 | Time         |
+| ------------------------------------------------------------------------- | ------------ |
+| Phase 6 — finalize README.md/AI-WORKLOG.md, requirements-compliance review, AI-WORKLOG-SUMMARY.md | 1h15m09s     |
+| Docs fixes made alongside later bonus/polish work (md-doc corrections, disclosing the Figma/bonus-UI scope gap) | 38m42s       |
+| **Docs total**                                                             | **1h53m51s** |
 
 **Bonus budget (separate target: ~2–3h, not counted against the core budget above):**
 
-| Bonus                          | Time     |
-| ------------------------------- | -------- |
-| Design Tools (Phase 3 — Figma via MCP) | 1h00m43s |
+| Bonus                                                                          | Time         |
+| --------------------------------------------------------------------------------- | ------------ |
+| Design Tools (Phase 3 Figma design via MCP, plus the later admin-header fix to match it) | 1h10m04s     |
+| LLM integration (OpenAI)                                                       | 39m07s       |
+| Shopify import                                                                 | 1h09m18s     |
+| Infrastructure (Docker Compose full-stack + CI)                               | 9m47s        |
+| Cross-cutting: backend axios migration (benefits both the LLM and Shopify integrations) | 35m36s       |
+| **Bonus total**                                                                | **3h43m52s** |
 
-Phase 3 (design) was originally miscounted into the core total in an earlier draft of this section — Design Tools is a bonus item per PROJECT-REQUIREMENTS.md, not part of the core admin/public/tests scope, so its time belongs in the bonus budget instead. The Infrastructure and LLM integration bonus items (both now done, see Bonus features below) were completed after this Clockify report's date range and aren't reflected in the table above yet.
+The bonus total runs noticeably over the ~2–3h allotment in AGENTS.md, mainly because all four bonus tasks were attempted (the plan only committed to attempting them, not to finishing all four within budget) and because the Shopify integration needed a second, unplanned pass when Shopify deprecated its legacy static-token auth flow mid-project (see "Shopify auth updated for the new Dev Dashboard flow" in [AI-WORKLOG.md](AI-WORKLOG.md)). Design Tools' own time also grew slightly after the Figma mockups were revisited to fix the admin header.
+
+**Grand total (core + docs + bonus): 13h46m42s**, matching the Clockify report's own reported total exactly.
 
 ## Bonus features
 
@@ -230,7 +245,7 @@ Phase 3 (design) was originally miscounted into the core total in an earlier dra
 | ------------------------------------ | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | LLM integration (OpenAI)             | Done (mock mode fully verified; real mode implemented but not exercised live — no API key in this environment) | "Suggest with AI" button on the product editor generates description/SEO fields in Ukrainian from the product's name and characteristics. See "AI content suggestions" below. |
 | Shopify import                       | Done, verified live end-to-end against a real test store | An "Import from Shopify" form on the admin product list creates a new draft product from a Shopify product ID. See "Shopify import" below. |
-| Design Tools (Figma → code)          | In progress (~1h of the ~2–3h bonus budget) | [Figma file](https://www.figma.com/design/XEWl5YinPePK2aQajd9xE3/Product-Content-Studio-%E2%80%94-UI-Design?node-id=0-1&t=u1ntu3s3m0f4qGVE-1) — Admin Login, Product List, Product Editor (desktop+mobile) designed and transferred to shadcn/ui components; see [AI-WORKLOG.md](AI-WORKLOG.md) for the transfer notes. Public catalog/product pages were built directly in code (reusing the same design language) rather than designed in Figma first. The Figma file predates the LLM and Shopify import bonuses below — the "Suggest with AI" panel and "Import from Shopify" form added to the admin screens afterward were built directly in code and have no Figma mockup. |
+| Design Tools (Figma → code)          | Partial (1h10m of the bonus budget — see "Time spent" above) | [Figma file](https://www.figma.com/design/XEWl5YinPePK2aQajd9xE3/Product-Content-Studio-%E2%80%94-UI-Design?node-id=0-1&t=u1ntu3s3m0f4qGVE-1) — Admin Login, Product List, Product Editor (desktop+mobile) designed and transferred to shadcn/ui components; see [AI-WORKLOG.md](AI-WORKLOG.md) for the transfer notes. Public catalog/product pages were built directly in code (reusing the same design language) rather than designed in Figma first. The Figma file predates the LLM and Shopify import bonuses below — the "Suggest with AI" panel and "Import from Shopify" form added to the admin screens afterward were built directly in code and have no Figma mockup. |
 | Infrastructure (Docker Compose / CI) | Done | `docker compose up` now runs the whole app (Postgres + a one-off `migrate` job + the Next.js app itself), not just the database — see "Running the whole app via Docker Compose" below. GitHub Actions CI ([.github/workflows/ci.yml](.github/workflows/ci.yml)) runs on every push/PR: lint, both `tsc --noEmit` targets, build, all four Jest suites (backend unit/integration via testcontainers, frontend unit/integration), and the Cypress e2e suite against a Postgres service container. |
 
 ## AI usage
