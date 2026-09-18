@@ -1,17 +1,27 @@
+# Single source of truth for the containers' Postgres connection string —
+# built from POSTGRES_USER/POSTGRES_PASSWORD/POSTGRES_DB (read from the
+# project's .env via Compose's automatic root-.env interpolation, same file
+# `env_file:` below loads into the containers) instead of the same
+# postgres:postgres@postgres:5432/product_content_studio string being
+# hardcoded separately in `migrate` and `web`. The `:-postgres` etc.
+# fallbacks match this file's pre-consolidation defaults, so an existing
+# .env without these three vars still works unchanged.
+x-postgres-url: &postgres-url postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-product_content_studio}?schema=public
+
 services:
   postgres:
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: product_content_studio
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-product_content_studio}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -31,7 +41,7 @@ services:
       # not localhost — this overrides whatever DATABASE_URL is in .env,
       # which is set up for connecting from the host machine during
       # un-dockerized `npm run dev` (see AGENTS.md).
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/product_content_studio?schema=public
+      DATABASE_URL: *postgres-url
     env_file:
       - path: .env
         required: false
@@ -51,7 +61,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/product_content_studio?schema=public
+      DATABASE_URL: *postgres-url
       NODE_ENV: production
     env_file:
       - path: .env

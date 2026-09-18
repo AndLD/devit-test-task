@@ -478,3 +478,9 @@ Destroy active docker containers and execute Getting started flow yourself and v
 ## Prompt No 108
 @"/Users/andrey/Downloads/Clockify_Time_Report_Summary_14_09_2026-20_09_2026 (2).pdf"
 See the new updated time report from Clockify. Verify entries dates are correct and sync time report in README with new time records from Clockify
+
+## Prompt No 109
+Check how full containerized app related Docker files reuse env vars. Seems like it include some duplications, for example, PostgreSQL DB URL. Is it relevant? Do not fix it without approve
+
+## Prompt No 110
+You should consolidate it and make .env file as the primary source of truth for such vars like Postgres-related ones
